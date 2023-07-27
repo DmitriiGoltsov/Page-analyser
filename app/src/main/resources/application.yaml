@@ -1,0 +1,19 @@
+datasource:
+  default: ${APP_ENV}
+
+  development:
+    username: "admin"
+    password: "admin"
+    url: "jdbc:h2:./database"
+
+  production:
+    username: ${DB_USER}
+    password: ${DB_PASSWORD}
+    url: ${DB_EXTERNAL_URL}
+ebean:
+  ddl:
+    run: true
+    generate: true
+    seedSql: seed.sql
+  migration:
+    run: true
