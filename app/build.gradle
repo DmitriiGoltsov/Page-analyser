@@ -1,0 +1,70 @@
+plugins {
+    id 'application'
+    id 'checkstyle'
+    id 'io.ebean' version '13.20.1'
+    id 'se.patrikerdes.use-latest-versions' version '0.2.18'
+    id 'com.github.ben-manes.versions' version '0.47.0'
+}
+
+group = 'hexlet.code'
+version = '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+compileJava {
+    options.release = 20
+    options.encoding = 'UTF-8'
+}
+
+application {
+    mainClass = 'hexlet.code.App'
+}
+
+dependencies {
+
+    implementation 'io.javalin:javalin:5.6.1'
+    implementation 'io.javalin:javalin-rendering:5.6.0'
+    implementation 'org.slf4j:slf4j-simple:2.0.7'
+
+    implementation 'org.thymeleaf:thymeleaf:3.1.1.RELEASE'
+    implementation 'nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect:3.2.1'
+    implementation 'org.thymeleaf.extras:thymeleaf-extras-java8time:3.0.4.RELEASE'
+    implementation 'org.webjars:bootstrap:5.3.0'
+
+    implementation 'com.h2database:h2:2.2.220'
+    implementation 'org.postgresql:postgresql:42.6.0'
+
+    implementation 'io.ebean:ebean:13.20.1'
+    implementation 'io.ebean:ebean-ddl-generator:13.20.1'
+    implementation 'io.ebean:ebean-querybean:13.20.1'
+    implementation 'io.ebean:ebean-migration:13.9.0'
+    implementation 'io.ebean:ebean-annotation:8.4'
+    annotationProcessor 'io.ebean:querybean-generator:13.20.1'
+
+    // JAX-B dependencies for JDK 9+
+    implementation "jakarta.xml.bind:jakarta.xml.bind-api:2.3.2"
+    implementation "org.glassfish.jaxb:jaxb-runtime:2.3.2"
+
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.10.0'
+    testImplementation 'org.junit.jupiter:junit-jupiter-params:5.10.0'
+    testImplementation 'org.assertj:assertj-core:3.24.2'
+    testImplementation 'io.ebean:ebean-test:13.20.1'
+    testImplementation 'com.konghq:unirest-java:4.0.0-RC2'
+
+}
+
+test {
+    useJUnitPlatform()
+}
+
+checkstyle {
+    toolVersion '10.12.1'
+}
+
+task generateMigrations(type: JavaExec) {
+    classpath = sourceSets.main.runtimeClasspath
+    mainClass = 'hexlet.code.MigrationGenerator'
+}
+
