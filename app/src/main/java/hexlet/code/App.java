@@ -61,7 +61,7 @@ public class App {
     }
 
     private static int getPort() {
-        String port = System.getenv().getOrDefault("PORT", "8081");
+        String port = System.getenv().getOrDefault("PORT", "8082");
         return Integer.valueOf(port);
     }
 
