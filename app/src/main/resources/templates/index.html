@@ -3,13 +3,55 @@
       layout:decorate="~{layouts/application.html}">
 
 <section layout:fragment="content">
-    <div class="card">
-        <div class="card-body p-5 bg-light">
-            <div class="display-4">Привет от Хекслета!</div>
-            <p class="lead">Практические курсы по программированию</p>
-            <hr>
-            <a class="btn btn-primary" href="https://ru.hexlet.io" target="_blank">Узнать Больше</a>
-        </div>
+    <div class="container-lg mt-5">
+        <h1>Сайты</h1>
+
+        <table class="table table-bordered table-hover mt-3">
+            <thead>
+            <tr>
+                <th class="col-1">ID</th>
+                <th>Имя</th>
+                <th class="col-2">Последняя проверка</th>
+                <th class="col-1">Код ответа</th>
+            </tr>
+            </thead>
+
+            <tbody>
+            <tr th:each="url : ${urls}" th:object="${url}">
+                <td th:text="*{id}"></td>
+                <td>
+                    <a th:text="*{name}" th:href="@{/urls/{id}(id=*{id})}"></a>
+                </td>
+                <td>
+                        <span class="col-2"
+                              th:if="${not #lists.isEmpty(url.urlChecks)}"
+                              th:text="${#temporals.format(url.urlChecks[#lists.size(url.urlChecks)-1].createdAt, 'dd-MM-yyyy HH:mm')}">
+                        </span>
+                </td>
+                <td>
+                        <span class="col-2"
+                              th:if="${not #lists.isEmpty(url.urlChecks)}"
+                              th:text="${url.urlChecks[#lists.size(url.urlChecks)-1].statusCode}">
+                      </span>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+
+        <nav aria-label="Page navigation" th:if="${#lists.size(pages)}">
+            <ul class="pagination justify-content-center mt-5">
+                <li th:class="'page-item' + ${currentPage <= 1 ? ' disabled' : ''}">
+                    <a class="page-link" th:href="@{/urls(page=${currentPage - 1})}">Previous</a>
+                </li>
+                <li th:each="page : ${pages}" th:class="'page-item' + ${currentPage == page ? ' active' : ''}">
+                    <a class="page-link" th:href="@{/urls(page=${page})}" th:text="${page}"></a>
+                </li>
+                <li th:class="'page-item' + ${currentPage >= #lists.size(pages) ? ' disabled' : ''}">
+                    <a class="page-link" th:href="@{/urls(page=${currentPage + 1})}">Next</a>
+                </li>
+            </ul>
+        </nav>
+
     </div>
 </section>
 
