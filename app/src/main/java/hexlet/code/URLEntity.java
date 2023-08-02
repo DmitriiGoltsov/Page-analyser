@@ -8,7 +8,7 @@ import javax.persistence.Id;
 import java.time.Instant;
 
 @Entity
-public class URL extends Model {
+public class URLEntity extends Model {
 
     @Id
     private long id;
@@ -16,7 +16,7 @@ public class URL extends Model {
     @WhenCreated
     private Instant createdAt;
 
-    public URL(String name) {
+    public URLEntity(String name) {
         this.name = name;
     }
 
