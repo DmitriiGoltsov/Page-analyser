@@ -15,7 +15,7 @@ import static io.javalin.apibuilder.ApiBuilder.get;
 
 public class App {
 
-    private static final String DEFAULT_PORT = "8082";
+    private static final String DEFAULT_PORT = "8085";
     private static final String DEFAULT_MODE = "production";
     private static final String ADDITIONAL_MODE = "development";
 

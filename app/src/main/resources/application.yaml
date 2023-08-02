@@ -2,9 +2,9 @@ datasource:
   default: ${APP_ENV}
 
   development:
-    username: "admin"
+    username: "dmitrii"
     password: "admin"
-    url: "jdbc:h2:./database"
+    url: "jdbc:h2:mem:2"
 
   production:
     username: ${DB_USER}
