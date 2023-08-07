@@ -1,15 +1,14 @@
 package hexlet.code.controllers;
 
-import hexlet.code.URLEntity;
-import hexlet.code.query.QURLEntity;
-import io.ebean.PagedList;
+import hexlet.code.model.Url;
+import hexlet.code.model.query.QUrl;
 import io.javalin.http.Handler;
 import io.javalin.http.NotFoundResponse;
 import org.jetbrains.annotations.NotNull;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.IntStream;
 
 public class URLController {
 
@@ -46,7 +45,7 @@ public class URLController {
             return;
         }
 
-        URLEntity urlToAdd = new URLEntity(normalizedUrl);
+        Url urlToAdd = new Url(normalizedUrl);
         urlToAdd.save();
 
         ctx.sessionAttribute("flash", "Страница успешно добавлена");
@@ -55,36 +54,32 @@ public class URLController {
     };
 
     public static Handler showURLs = ctx -> {
+        Url url = new QUrl()
+                .name.equalTo("ya.ru")
+                .findOne();
 
-        int page = ctx.queryParamAsClass("page", Integer.class).getOrDefault(1) - 1;
+        if (url == null) {
+            Url url1 = new Url("ya.ru");
+            url1.save();
+        }
 
-        PagedList<URLEntity> pagedURLs = new QURLEntity()
-                .setFirstRow(page * ROWS_PER_PAGES)
-                .setMaxRows(ROWS_PER_PAGES)
-                .orderBy()
-                .id.asc()
-                .findPagedList();
 
-        List<URLEntity> URLs = pagedURLs.getList();
+        Url urlDb = new QUrl()
+                .name.equalTo("ya.ru")
+                .findOne();
+        System.out.println("read url from DB: " + urlDb);
 
-        int currentPage = pagedURLs.getPageIndex() + 1;
-        int lastPage = pagedURLs.getTotalPageCount() + 1;
-        List<Integer> pages = IntStream
-                .range(1, lastPage)
-                .boxed()
-                .toList();
+        List<Url> urls = new ArrayList<>();
+        urls.add(urlDb);
 
-        ctx.attribute("urls", URLs);
-        ctx.attribute("pages", pages);
-        ctx.attribute("currentPage", currentPage);
-
+        ctx.attribute("urls", urls);
         ctx.render("urls/index.html");
     };
 
     public static Handler showURLById = ctx -> {
         int id = ctx.pathParamAsClass("id", Integer.class).getOrDefault(null);
 
-        URLEntity url = new QURLEntity()
+        Url url = new QUrl()
                 .id.equalTo(id)
                 .findOne();
 
@@ -111,7 +106,7 @@ public class URLController {
     }
 
     private static boolean doesUrlAlreadyExist(String urlToCheck) {
-        URLEntity urlFromDB = new QURLEntity()
+        Url urlFromDB = new QUrl()
                 .name.iequalTo(urlToCheck)
                 .findOne();
 

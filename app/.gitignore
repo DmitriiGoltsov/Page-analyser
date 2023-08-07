@@ -13,5 +13,6 @@ bin
 .idea/
 /resources/
 *.log
+database.mv.db
 /app/database.mv.db
 /app/database.trace.db
