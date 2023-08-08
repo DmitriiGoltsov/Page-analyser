@@ -79,6 +79,7 @@ public class App {
 
         ClassLoaderTemplateResolver templateResolver = new ClassLoaderTemplateResolver();
         templateResolver.setPrefix("/templates/");
+        templateResolver.setSuffix(".html");
         templateResolver.setCharacterEncoding("UTF-8");
         templateEngine.addTemplateResolver(templateResolver);
 
