@@ -2,81 +2,99 @@ package hexlet.code.controllers;
 
 import hexlet.code.model.Url;
 import hexlet.code.model.query.QUrl;
+import io.ebean.PagedList;
 import io.javalin.http.Handler;
 import io.javalin.http.NotFoundResponse;
 import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.LogManager;
+import java.util.stream.IntStream;
 
 public class URLController {
 
     private static final int ROWS_PER_PAGES = 10;
+    private static final Logger logger = LoggerFactory.getLogger(URLController.class.getName());
 
     public static Handler createURL = ctx -> {
 
         String urlName = ctx.formParam("url");
-
-        System.out.println("urlName is: " + urlName);
+        logger.info("urlName is: " + urlName);
 
         URL rawURL;
         try {
+            logger.info("\n" + "Пытаюсь создать новый урл" + "\n");
             rawURL = new URL(urlName);
+            System.out.println(rawURL.toString());
         } catch (MalformedURLException e) {
             ctx.sessionAttribute("flash", "Некорректный URL");
             ctx.sessionAttribute("flash-type", "danger");
             ctx.redirect("templates/index.html");
+            logger.debug("\n" + "An exception has occurred" + "\n");
             return;
         }
 
+        logger.info("\n" + "Trying to normalize url" + "\n");
         String protocol = rawURL.getProtocol();
         String host = rawURL.getHost();
         int port = rawURL.getPort();
 
         String normalizedUrl = getNormalizedUrl(protocol, host, port);
-
-        System.out.println("normalizedUrl is: " + normalizedUrl);
-
+        logger.info("\n" + "normalizedUrl is: " + normalizedUrl + "\n");
+        logger.info("\n" + doesUrlAlreadyExist(normalizedUrl) + "\n");
         if (doesUrlAlreadyExist(normalizedUrl)) {
             ctx.sessionAttribute("flash", "Страница уже существует");
             ctx.sessionAttribute("flash-type", "info");
             ctx.redirect("/urls");
+            logger.info("\n" + "URL already exists" + "\n");
             return;
         }
 
         Url urlToAdd = new Url(normalizedUrl);
         urlToAdd.save();
 
+        logger.info("\n" + "Page has been successfully added." + "\n");
         ctx.sessionAttribute("flash", "Страница успешно добавлена");
         ctx.sessionAttribute("flash-type", "success");
         ctx.redirect("/urls");
     };
 
     public static Handler showURLs = ctx -> {
-        Url url = new QUrl()
-                .name.equalTo("ya.ru")
-                .findOne();
+        logger.info("Попытка загрузить URLs");
+        int page = ctx.queryParamAsClass("page", Integer.class).getOrDefault(1);
+        int offset = page * ROWS_PER_PAGES - ROWS_PER_PAGES;
 
-        if (url == null) {
-            Url url1 = new Url("ya.ru");
-            url1.save();
-        }
+        PagedList<Url> pagedUrl = new QUrl()
+                .setFirstRow(offset)
+                .setMaxRows(ROWS_PER_PAGES)
+                .orderBy()
+                .id.asc()
+                .findPagedList();
 
+        List<Url> urls = pagedUrl.getList();
+        int currentPage = pagedUrl.getPageIndex() + 1;
+        int lastPage = pagedUrl.getTotalPageCount() + 1;
 
-        Url urlDb = new QUrl()
-                .name.equalTo("ya.ru")
-                .findOne();
-        System.out.println("read url from DB: " + urlDb);
+        List<Integer> pages = IntStream
+                .range(1, lastPage)
+                .boxed()
+                .toList();
 
-        List<Url> urls = new ArrayList<>();
-        urls.add(urlDb);
-
+        ctx.attribute("pages", pages);
+        ctx.attribute("currentPage", currentPage);
         ctx.attribute("urls", urls);
-        ctx.render("urls/index.html");
+
+        ctx.render("urls/showURLs.html");
+        logger.info("\n" + "Urls выведены на экран" + "\n");
     };
 
     public static Handler showURLById = ctx -> {
+        logger.info("Trying to find URL by its id");
         int id = ctx.pathParamAsClass("id", Integer.class).getOrDefault(null);
 
         Url url = new QUrl()
@@ -89,7 +107,6 @@ public class URLController {
 
         ctx.attribute("url", url);
         ctx.render("urls/show.html");
-
     };
 
     @NotNull
