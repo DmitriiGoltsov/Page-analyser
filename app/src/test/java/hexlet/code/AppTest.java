@@ -4,9 +4,15 @@ import hexlet.code.model.Url;
 import io.ebean.DB;
 import io.ebean.Database;
 import io.javalin.Javalin;
+import jakarta.servlet.http.HttpServletResponse;
 import kong.unirest.HttpResponse;
 import kong.unirest.Unirest;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Assertions;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -49,7 +55,7 @@ public class AppTest {
     public void testWelcome() {
         HttpResponse<String> response = Unirest.get(baseUrl).asString();
         int status = response.getStatus();
-        assertThat(status).isEqualTo(200);
+        assertThat(status).isEqualTo(HttpServletResponse.SC_OK);
     }
 
     @Nested
@@ -62,14 +68,14 @@ public class AppTest {
                     .asString();
 
             int postQueryStatus = response.getStatus();
-            Assertions.assertEquals(postQueryStatus, 302);
+            Assertions.assertEquals(postQueryStatus, HttpServletResponse.SC_FOUND);
 
             response = Unirest.get(baseUrl + "/urls").asString();
 
             int getQueryStatus = response.getStatus();
             String responseBody = response.getBody();
 
-            assertThat(getQueryStatus).isEqualTo(200);
+            assertThat(getQueryStatus).isEqualTo(HttpServletResponse.SC_OK);
             assertThat(responseBody).contains("Страница успешно добавлена");
             assertThat(responseBody).contains(CORRECT_URL);
         }
@@ -81,7 +87,7 @@ public class AppTest {
                     .asString();
 
             int postQueryStatus = response.getStatus();
-            assertThat(postQueryStatus).isEqualTo(302);
+            assertThat(postQueryStatus).isEqualTo(HttpServletResponse.SC_FOUND);
 
             response = Unirest.get(baseUrl).asString();
             assertThat(response.getBody()).contains("Некорректный URL");
@@ -96,7 +102,7 @@ public class AppTest {
             String body = response.getBody();
             int getQueryStatus = response.getStatus();
 
-            assertThat(getQueryStatus).isEqualTo(200);
+            assertThat(getQueryStatus).isEqualTo(HttpServletResponse.SC_OK);
             assertThat(body).contains(EXPECTED_URL);
         }
 
@@ -105,12 +111,35 @@ public class AppTest {
             HttpResponse<String> response = Unirest.get(baseUrl + "/urls/1").asString();
             String body = response.getBody();
 
-            assertThat(response.getStatus()).isEqualTo(200);
+            assertThat(response.getStatus()).isEqualTo(HttpServletResponse.SC_OK);
             assertThat(body).contains(EXPECTED_URL);
 
             response = Unirest.get(baseUrl + "/urls/2").asString();
-            assertThat(response.getStatus()).isEqualTo(404);
+            assertThat(response.getStatus()).isEqualTo(HttpServletResponse.SC_NOT_FOUND);
         }
+    }
+
+    @Nested
+    class UrlCheckControllerTest {
+
+        @Test
+        public void urlCheckTest() {
+            HttpResponse<String> response = Unirest.get(baseUrl + "/urls/1").asString();
+            assertThat(response.getStatus()).isEqualTo(HttpServletResponse.SC_OK);
+            assertThat(response.getBody()).contains(EXPECTED_URL);
+
+            HttpResponse responsePost = Unirest
+                    .post(baseUrl + "/urls/1/checks")
+                    .asEmpty();
+
+            assertThat(responsePost.getStatus()).isEqualTo(HttpServletResponse.SC_FOUND);
+
+            response = Unirest.get(baseUrl + "/urls/1").asString();
+            assertThat(response.getBody()).contains("Страница успешно проверена");
+            assertThat(response.getBody())
+                    .contains("Example Domain");
+        }
+
     }
 
 
