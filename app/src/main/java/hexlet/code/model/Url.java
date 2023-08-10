@@ -5,6 +5,7 @@ import io.ebean.annotation.WhenCreated;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import java.time.Instant;
+import java.util.List;
 
 @Entity
 public final class Url extends Model {
@@ -16,6 +17,8 @@ public final class Url extends Model {
 
     @WhenCreated
     private Instant createdAt;
+    private List<UrlCheck> urlChecks;
+
 
     public Url(String name) {
         this.name = name;
@@ -33,4 +36,7 @@ public final class Url extends Model {
         return this.createdAt;
     }
 
+    public List<UrlCheck> getUrlChecks() {
+        return urlChecks;
+    }
 }
