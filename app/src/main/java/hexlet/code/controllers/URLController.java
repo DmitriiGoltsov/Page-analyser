@@ -8,64 +8,62 @@ import io.javalin.http.NotFoundResponse;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.LogManager;
+import java.util.Objects;
 import java.util.stream.IntStream;
 
 public class URLController {
 
     private static final int ROWS_PER_PAGES = 10;
-    private static final Logger logger = LoggerFactory.getLogger(URLController.class.getName());
+    private static final Logger LOGGER = LoggerFactory.getLogger(URLController.class.getName());
 
     public static Handler createURL = ctx -> {
 
         String urlName = ctx.formParam("url");
-        logger.info("urlName is: " + urlName);
+        LOGGER.info("urlName is: " + urlName);
 
         URL rawURL;
         try {
-            logger.info("\n" + "Пытаюсь создать новый урл" + "\n");
-            rawURL = new URL(urlName);
-            System.out.println(rawURL.toString());
+            LOGGER.info("Пытаюсь создать новый урл {}", urlName);
+            rawURL = new URL(Objects.requireNonNull(urlName));
         } catch (MalformedURLException e) {
             ctx.sessionAttribute("flash", "Некорректный URL");
             ctx.sessionAttribute("flash-type", "danger");
             ctx.redirect("templates/index.html");
-            logger.debug("\n" + "An exception has occurred" + "\n");
+            LOGGER.debug("\n" + "An exception has occurred" + "\n");
             return;
         }
 
-        logger.info("\n" + "Trying to normalize url" + "\n");
+        LOGGER.info("\n" + "Trying to normalize url" + "\n");
         String protocol = rawURL.getProtocol();
         String host = rawURL.getHost();
         int port = rawURL.getPort();
 
         String normalizedUrl = getNormalizedUrl(protocol, host, port);
-        logger.info("\n" + "normalizedUrl is: " + normalizedUrl + "\n");
-        logger.info("\n" + doesUrlAlreadyExist(normalizedUrl) + "\n");
+        LOGGER.info("\n" + "normalizedUrl is: " + normalizedUrl + "\n");
+        LOGGER.info("\n" + doesUrlAlreadyExist(normalizedUrl) + "\n");
+
         if (doesUrlAlreadyExist(normalizedUrl)) {
             ctx.sessionAttribute("flash", "Страница уже существует");
             ctx.sessionAttribute("flash-type", "info");
             ctx.redirect("/urls");
-            logger.info("\n" + "URL already exists" + "\n");
+            LOGGER.info("\n" + "URL already exists" + "\n");
             return;
         }
 
         Url urlToAdd = new Url(normalizedUrl);
         urlToAdd.save();
+        LOGGER.info("\n" + "Page has been successfully added." + "\n");
 
-        logger.info("\n" + "Page has been successfully added." + "\n");
         ctx.sessionAttribute("flash", "Страница успешно добавлена");
         ctx.sessionAttribute("flash-type", "success");
         ctx.redirect("/urls");
     };
 
     public static Handler showURLs = ctx -> {
-        logger.info("Попытка загрузить URLs");
+        LOGGER.info("Попытка загрузить URLs");
         int page = ctx.queryParamAsClass("page", Integer.class).getOrDefault(1);
         int offset = page * ROWS_PER_PAGES - ROWS_PER_PAGES;
 
@@ -90,11 +88,11 @@ public class URLController {
         ctx.attribute("urls", urls);
 
         ctx.render("urls/showURLs.html");
-        logger.info("\n" + "Urls выведены на экран" + "\n");
+        LOGGER.info("\n" + "Urls выведены на экран" + "\n");
     };
 
     public static Handler showURLById = ctx -> {
-        logger.info("Trying to find URL by its id");
+        LOGGER.info("Trying to find URL by its id");
         int id = ctx.pathParamAsClass("id", Integer.class).getOrDefault(null);
 
         Url url = new QUrl()
