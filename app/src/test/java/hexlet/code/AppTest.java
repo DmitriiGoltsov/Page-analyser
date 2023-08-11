@@ -16,7 +16,7 @@ import org.junit.jupiter.api.Assertions;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class AppTest {
+public final class AppTest {
 
     @Test
     public void testInit() {

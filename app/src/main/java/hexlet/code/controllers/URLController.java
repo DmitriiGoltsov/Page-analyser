@@ -32,7 +32,7 @@ public class URLController {
             ctx.sessionAttribute("flash", "Некорректный URL");
             ctx.sessionAttribute("flash-type", "danger");
             ctx.redirect("templates/index.html");
-            LOGGER.debug("\n" + "An exception has occurred" + "\n");
+            LOGGER.debug("An exception has occurred: " + e.getMessage());
             return;
         }
 
