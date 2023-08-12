@@ -1,6 +1,7 @@
 package hexlet.code;
 
 import hexlet.code.model.Url;
+import hexlet.code.model.query.QUrl;
 import io.ebean.DB;
 import io.ebean.Database;
 import io.javalin.Javalin;
@@ -108,6 +109,7 @@ public final class AppTest {
 
         @Test
         public void testShowUrlById() {
+
             HttpResponse<String> response = Unirest.get(baseUrl + "/urls/1").asString();
             String body = response.getBody();
 
@@ -124,20 +126,33 @@ public final class AppTest {
 
         @Test
         public void urlCheckTest() {
-            HttpResponse<String> response = Unirest.get(baseUrl + "/urls/1").asString();
-            assertThat(response.getStatus()).isEqualTo(HttpServletResponse.SC_OK);
-            assertThat(response.getBody()).contains(EXPECTED_URL);
 
-            HttpResponse responsePost = Unirest
-                    .post(baseUrl + "/urls/1/checks")
+            var response = Unirest
+                    .post(baseUrl + "/urls")
+                    .field("url", CORRECT_URL)
                     .asEmpty();
 
-            assertThat(responsePost.getStatus()).isEqualTo(HttpServletResponse.SC_FOUND);
+            Url actualUrl = new QUrl()
+                    .name.equalTo(CORRECT_URL)
+                    .findOne();
 
-            response = Unirest.get(baseUrl + "/urls/1").asString();
-            assertThat(response.getBody()).contains("Страница успешно проверена");
-            assertThat(response.getBody())
-                    .contains("Example Domain");
+            assertThat(actualUrl).isNotNull();
+            assertThat(actualUrl.getName()).isEqualTo(CORRECT_URL);
+
+            long id = actualUrl.getId();
+
+            var checkResponse = Unirest
+                    .post(baseUrl + "/urls/" + id + "/checks")
+                    .asEmpty();
+
+            assertThat(checkResponse.getStatus()).isEqualTo(HttpServletResponse.SC_OK);
+            assertThat(checkResponse.getBody()).toString().contains(EXPECTED_URL);
+            assertThat(checkResponse.getStatus()).isEqualTo(HttpServletResponse.SC_FOUND);
+
+            checkResponse = Unirest.get(baseUrl + "/urls/1").asString();
+            assertThat(checkResponse.getBody()).toString().contains("Страница успешно проверена");
+            assertThat(checkResponse.getBody()).toString().contains("Example Domain");
+
         }
 
     }
