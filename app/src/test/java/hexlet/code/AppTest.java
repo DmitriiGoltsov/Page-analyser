@@ -110,11 +110,17 @@ public final class AppTest {
         @Test
         public void testShowUrlById() {
 
-            HttpResponse<String> response = Unirest.get(baseUrl + "/urls/1").asString();
+            Url actualUrl = new QUrl()
+                    .name.equalTo(CORRECT_URL)
+                    .findOne();
+
+            long id = actualUrl.getId();
+
+            HttpResponse<String> response = Unirest.get(baseUrl + "/urls/" + id).asString();
             String body = response.getBody();
 
             assertThat(response.getStatus()).isEqualTo(HttpServletResponse.SC_OK);
-            assertThat(body).contains(EXPECTED_URL);
+            assertThat(body).contains(CORRECT_URL);
 
             response = Unirest.get(baseUrl + "/urls/2").asString();
             assertThat(response.getStatus()).isEqualTo(HttpServletResponse.SC_NOT_FOUND);
@@ -149,7 +155,7 @@ public final class AppTest {
             assertThat(checkResponse.getBody()).toString().contains(EXPECTED_URL);
             assertThat(checkResponse.getStatus()).isEqualTo(HttpServletResponse.SC_FOUND);
 
-            checkResponse = Unirest.get(baseUrl + "/urls/1").asString();
+            checkResponse = Unirest.get(baseUrl + "/urls/" + id).asString();
             assertThat(checkResponse.getBody()).toString().contains("Страница успешно проверена");
             assertThat(checkResponse.getBody()).toString().contains("Example Domain");
 
