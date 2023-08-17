@@ -11,6 +11,7 @@ import java.util.List;
 
 @Entity
 public final class Url extends Model {
+
     @Id
     private long id;
     private String name;
