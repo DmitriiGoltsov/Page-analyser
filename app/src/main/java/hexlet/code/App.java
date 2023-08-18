@@ -35,7 +35,7 @@ public class App {
             if (!isProduction()) {
                 config.plugins.enableDevLogging();
             }
-            config.staticFiles.enableWebjars();
+
             JavalinThymeleaf.init(getTemplateEngine());
         });
 
@@ -59,7 +59,7 @@ public class App {
                 path("/{id}", () -> {
                     get(URLController.showURLById);
                     path("/checks", () -> {
-                        post(UrlCheckController.checkUrl);
+                        post(UrlCheckController.addCheck);
                     });
                 });
             });
@@ -80,14 +80,14 @@ public class App {
 
         TemplateEngine templateEngine = new TemplateEngine();
 
-        templateEngine.addDialect(new LayoutDialect());
-        templateEngine.addDialect(new Java8TimeDialect());
-
         ClassLoaderTemplateResolver templateResolver = new ClassLoaderTemplateResolver();
         templateResolver.setPrefix("/templates/");
         templateResolver.setSuffix(".html");
         templateResolver.setCharacterEncoding("UTF-8");
+
         templateEngine.addTemplateResolver(templateResolver);
+        templateEngine.addDialect(new LayoutDialect());
+        templateEngine.addDialect(new Java8TimeDialect());
 
         return templateEngine;
     }

@@ -1,17 +1,15 @@
 package hexlet.code.controllers;
 
 import hexlet.code.model.Url;
+import hexlet.code.model.UrlCheck;
 import hexlet.code.model.query.QUrl;
 import io.ebean.PagedList;
 import io.javalin.http.Handler;
 import io.javalin.http.NotFoundResponse;
-import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.IntStream;
 
 public class URLController {
@@ -23,77 +21,85 @@ public class URLController {
 
         String urlName = ctx.formParam("url");
         LOGGER.info("urlName is: " + urlName);
+        String urlAddress;
 
-        URL rawURL;
         try {
-            LOGGER.info("Пытаюсь создать новый урл {}", urlName);
-            rawURL = new URL(Objects.requireNonNull(urlName));
-        } catch (MalformedURLException e) {
+            URL rawUrl = new URL(urlName);
+            String protocol = rawUrl.getProtocol();
+            String host = rawUrl.getHost();
+            int port = rawUrl.getPort();
+            String portAsString = port == -1
+                    ? ""
+                    : String.valueOf(port);
+
+            urlAddress = protocol + "://" + host + portAsString;
+        } catch (Exception e) {
             ctx.sessionAttribute("flash", "Некорректный URL");
             ctx.sessionAttribute("flash-type", "danger");
-            ctx.redirect("templates/index.html");
+            ctx.redirect("/index.html");
             LOGGER.debug("An exception has occurred: " + e.getMessage());
             return;
         }
 
-        LOGGER.info("\n" + "Trying to normalize url" + "\n");
-        String protocol = rawURL.getProtocol();
-        String host = rawURL.getHost();
-        int port = rawURL.getPort();
+        Url existingUrl = new QUrl()
+                .name.ieq(urlAddress)
+                .findOne();
 
-        String normalizedUrl = getNormalizedUrl(protocol, host, port);
-        LOGGER.info("\n" + "normalizedUrl is: " + normalizedUrl + "\n");
-        LOGGER.info("\n" + doesUrlAlreadyExist(normalizedUrl) + "\n");
-
-        if (doesUrlAlreadyExist(normalizedUrl)) {
+        if (existingUrl != null) {
             ctx.sessionAttribute("flash", "Страница уже существует");
-            ctx.sessionAttribute("flash-type", "info");
+            ctx.sessionAttribute("flash-type", "success");
+
             ctx.redirect("/urls");
-            LOGGER.info("\n" + "URL already exists" + "\n");
+            LOGGER.info("URL already exists!");
             return;
         }
 
-        Url urlToAdd = new Url(normalizedUrl);
-        urlToAdd.save();
-        LOGGER.info("\n" + "Page has been successfully added." + "\n");
+        Url urlToSave = new Url(urlAddress);
+        urlToSave.save();
 
         ctx.sessionAttribute("flash", "Страница успешно добавлена");
         ctx.sessionAttribute("flash-type", "success");
+
         ctx.redirect("/urls");
+        LOGGER.info("URL ADDED SUCCESSFULLY");
     };
 
     public static Handler showURLs = ctx -> {
         LOGGER.info("Попытка загрузить URLs");
-        int page = ctx.queryParamAsClass("page", Integer.class).getOrDefault(1);
-        int offset = page * ROWS_PER_PAGES - ROWS_PER_PAGES;
 
-        PagedList<Url> pagedUrl = new QUrl()
+        int normalizedPage;
+        try {
+            String page = ctx.queryParam("page");
+            normalizedPage = Integer.parseInt(page);
+        } catch (IllegalArgumentException e) {
+            normalizedPage = 1;
+        }
+
+        int offset = (normalizedPage - 1) * ROWS_PER_PAGES;
+
+        PagedList<Url> pagedUrls = new QUrl()
                 .setFirstRow(offset)
                 .setMaxRows(ROWS_PER_PAGES)
                 .orderBy()
                 .id.asc()
                 .findPagedList();
 
-        List<Url> urls = pagedUrl.getList();
-        int currentPage = pagedUrl.getPageIndex() + 1;
-        int lastPage = pagedUrl.getTotalPageCount() + 1;
+        int pagesCount = pagedUrls.getTotalPageCount();
 
-        List<Integer> pages = IntStream
-                .range(1, lastPage)
-                .boxed()
-                .toList();
+        int[] pages = IntStream.rangeClosed(1, pagesCount).toArray();
+        List<Url> urls = pagedUrls.getList();
 
-        ctx.attribute("pages", pages);
-        ctx.attribute("currentPage", currentPage);
         ctx.attribute("urls", urls);
+        ctx.attribute("currentPage", normalizedPage);
+        ctx.attribute("pages", pages);
 
-        ctx.render("urls/showURLs.html");
-        LOGGER.info("\n" + "Urls выведены на экран" + "\n");
+        ctx.render("urls/showURLs");
+        LOGGER.info("URLS PAGE IS RENDERED");
     };
 
     public static Handler showURLById = ctx -> {
         LOGGER.info("Trying to find URL by its id");
-        int id = ctx.pathParamAsClass("id", Integer.class).getOrDefault(null);
+        Long id = ctx.pathParamAsClass("id", Long.class).getOrDefault(null);
 
         Url url = new QUrl()
                 .id.equalTo(id)
@@ -103,28 +109,11 @@ public class URLController {
             throw new NotFoundResponse("The ulr you are looking for is not found");
         }
 
+        List<UrlCheck> checks = url.getUrlChecks();
+
         ctx.attribute("url", url);
+        ctx.attribute("checks", checks);
         ctx.render("urls/show.html");
+        LOGGER.info("Page of " + url.getName() + "is being rendered");
     };
-
-    @NotNull
-    private static String getNormalizedUrl(String protocol, String host, int port) {
-        StringBuilder sb = new StringBuilder();
-        sb.append(protocol).append("://").append(host);
-
-        if (port != -1) {
-            sb.append(port);
-        }
-
-        String normalizedUrl = sb.toString();
-        return normalizedUrl;
-    }
-
-    private static boolean doesUrlAlreadyExist(String urlToCheck) {
-        Url urlFromDB = new QUrl()
-                .name.iequalTo(urlToCheck)
-                .findOne();
-
-        return urlFromDB != null;
-    }
 }
