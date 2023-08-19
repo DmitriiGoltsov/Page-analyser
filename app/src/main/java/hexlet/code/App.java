@@ -1,7 +1,7 @@
 package hexlet.code;
 
 import hexlet.code.controllers.RootController;
-import hexlet.code.controllers.URLController;
+import hexlet.code.controllers.UrlController;
 import hexlet.code.controllers.UrlCheckController;
 import io.javalin.Javalin;
 import io.javalin.rendering.template.JavalinThymeleaf;
@@ -54,10 +54,10 @@ public class App {
 
         app.routes(() -> {
             path("/urls", () -> {
-                get(URLController.showURLs);
-                post(URLController.createURL);
+                get(UrlController.showURLs);
+                post(UrlController.createURL);
                 path("/{id}", () -> {
-                    get(URLController.showURLById);
+                    get(UrlController.showURLById);
                     path("/checks", () -> {
                         post(UrlCheckController.addCheck);
                     });
