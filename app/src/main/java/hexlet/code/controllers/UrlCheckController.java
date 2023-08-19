@@ -51,7 +51,7 @@ public class UrlCheckController {
             ctx.sessionAttribute("flash", "Страница успешно проверена");
             ctx.sessionAttribute("flash-type", "success");
             LOGGER.info("Check is done and added to the DB");
-        }catch (UnirestException e) {
+        } catch (UnirestException e) {
             ctx.sessionAttribute("flash", "Некорректный адрес");
             ctx.sessionAttribute("flash-type", "danger");
         } catch (Exception e) {
