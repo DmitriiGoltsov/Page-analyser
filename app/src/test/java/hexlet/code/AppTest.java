@@ -1,7 +1,9 @@
 package hexlet.code;
 
 import hexlet.code.model.Url;
+import hexlet.code.model.UrlCheck;
 import hexlet.code.model.query.QUrl;
+import hexlet.code.model.query.QUrlCheck;
 import io.ebean.DB;
 import io.ebean.Database;
 import io.javalin.Javalin;
@@ -145,20 +147,17 @@ public final class AppTest {
             assertThat(actualUrl).isNotNull();
             assertThat(actualUrl.getName()).isEqualTo(CORRECT_URL);
 
-            long id = actualUrl.getId();
+            UrlCheck actualCheckUrl = new QUrlCheck()
+                    .url.equalTo(actualUrl)
+                    .orderBy()
+                    .createdAt.desc()
+                    .findOne();
 
-            var checkResponse = Unirest
-                    .post(baseUrl + "/urls/" + id + "/checks")
-                    .asEmpty();
-
-            assertThat(checkResponse.getStatus()).isEqualTo(HttpServletResponse.SC_OK);
-            assertThat(checkResponse.getBody()).toString().contains(EXPECTED_URL);
-            assertThat(checkResponse.getStatus()).isEqualTo(HttpServletResponse.SC_FOUND);
-
-            checkResponse = Unirest.get(baseUrl + "/urls/" + id).asString();
-            assertThat(checkResponse.getBody()).toString().contains("Страница успешно проверена");
-            assertThat(checkResponse.getBody()).toString().contains("Example Domain");
-
+            assertThat(actualCheckUrl).isNotNull();
+            assertThat(actualCheckUrl.getStatusCode()).isEqualTo(200);
+            assertThat(actualCheckUrl.getTitle()).isEqualTo("Test page");
+            assertThat(actualCheckUrl.getH1()).isEqualTo("Do not expect a miracle, miracles yourself!");
+            assertThat(actualCheckUrl.getDescription()).contains("statements of great people");
         }
 
     }
