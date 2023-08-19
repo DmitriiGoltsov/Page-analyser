@@ -1,32 +1,26 @@
 package hexlet.code.controllers;
 
-import groovy.util.logging.Log;
 import hexlet.code.model.Url;
 import hexlet.code.model.UrlCheck;
 import hexlet.code.model.query.QUrl;
 import io.ebean.DB;
 import io.ebean.Transaction;
 import io.javalin.http.Handler;
-import io.javalin.http.NotFoundResponse;
 import kong.unirest.HttpResponse;
 import kong.unirest.Unirest;
 import kong.unirest.UnirestException;
-import org.h2.schema.Domain;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import java.util.Objects;
 
 public class UrlCheckController {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(URLController.class.getName());
+    private static final Logger LOGGER = LoggerFactory.getLogger(UrlController.class.getName());
 
     public static Handler addCheck = ctx -> {
         Long id = ctx.pathParamAsClass("id", Long.class).getOrDefault(null);
-        String body = "";
-        int statusCode = 0;
 
         Url url = new QUrl()
                 .id.equalTo(id)
@@ -37,41 +31,33 @@ public class UrlCheckController {
             HttpResponse<String> response = Unirest
                     .get(url.getName())
                     .asString();
+            int statusCode = response.getStatus();
 
-            body = response.getBody();
-            statusCode = response.getStatus();
-        } catch (Exception e) {
-            ctx.sessionAttribute("flash", "Неверный адрес");
-            ctx.sessionAttribute("flash-type", "danger");
+            Document document = Jsoup.parse(response.getBody());
+            String title = document.title();
+            Element h1Element = document.selectFirst("h1");
+            String h1 = h1Element == null
+                    ? ""
+                    : h1Element.text();
+            Element descriptionElement = document.selectFirst("description");
+            String description = descriptionElement == null
+                    ? ""
+                    : descriptionElement.attr("content");
 
-            ctx.attribute("url", url);
-            ctx.attribute("checks", url.getUrlChecks());
-            LOGGER.error(url.getName() + " is not correct address!");
-            ctx.redirect("/urls/" + id);
-        }
-
-        Document document = Jsoup.parse(body);
-        String title = getTagValue(document, "title");
-        String h1 = getTagValue(document, "h1");
-        String description = getDescription(document);
-
-        UrlCheck checkToAdd = new UrlCheck(statusCode, title, h1, description, url);
-
-        try (Transaction transaction = DB.beginTransaction()){
-            url.addUrlCheck(checkToAdd);
-            checkToAdd.save();
+            UrlCheck urlCheckToAdd = new UrlCheck(statusCode, title, h1, description, url);
+            url.getUrlChecks().add(urlCheckToAdd);
             url.save();
 
-            transaction.commit();
+            ctx.sessionAttribute("flash", "Страница успешно проверена");
+            ctx.sessionAttribute("flash-type", "success");
+            LOGGER.info("Check is done and added to the DB");
+        }catch (UnirestException e) {
+            ctx.sessionAttribute("flash", "Некорректный адрес");
+            ctx.sessionAttribute("flash-type", "danger");
+        } catch (Exception e) {
+            ctx.sessionAttribute("flash", e.getMessage());
+            ctx.sessionAttribute("flash-type", "danger");
         }
-
-        ctx.sessionAttribute("flash", "Страница успешно проверена");
-        ctx.sessionAttribute("flash-type", "success");
-
-        ctx.attribute("url", url);
-        ctx.attribute("checks", url.getUrlChecks());
-        ctx.redirect("/urls/" + id);
-        LOGGER.info("Check is done and added to the DB");
     };
 
     private static String getTagValue (Document document, String tag) {
