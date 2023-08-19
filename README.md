@@ -7,5 +7,34 @@
 ### CodeClimate test coverage:
 [![Test Coverage](https://api.codeclimate.com/v1/badges/0384964c95093dd6ab20/test_coverage)](https://codeclimate.com/github/DmitriiGoltsov/java-project-72/test_coverage)
 
-# Description
-Simple web-application dedicated to analyze web-sites for their SEO-suitability
+## Description
+The study project for learning of java web application construction and usage of Javalin framework Thymeleaf and others.
+
+## Used technologies
+* Javalin
+* Thymeleaf
+* Bootstrap
+* Ebean
+* H2
+* PostgreSQL
+* JUnit
+* MockWebServer
+
+## Requirements
+
+* JDK 20
+* Gradle 8.2
+* GNU Make
+
+## Setup
+
+```zsh
+make setup
+```
+
+## Run server
+
+```zsh
+make start
+# Open http://localhost:3000
+```
