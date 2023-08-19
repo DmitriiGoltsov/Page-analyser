@@ -3,6 +3,7 @@ package hexlet.code.controllers;
 import hexlet.code.model.Url;
 import hexlet.code.model.UrlCheck;
 import hexlet.code.model.query.QUrl;
+import hexlet.code.model.query.QUrlCheck;
 import io.ebean.PagedList;
 import io.javalin.http.Handler;
 import io.javalin.http.NotFoundResponse;
@@ -10,29 +11,23 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.net.URL;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.IntStream;
 
-public class URLController {
+public class UrlController {
 
     private static final int ROWS_PER_PAGES = 10;
-    private static final Logger LOGGER = LoggerFactory.getLogger(URLController.class.getName());
+    private static final Logger LOGGER = LoggerFactory.getLogger(UrlController.class.getName());
 
     public static Handler createURL = ctx -> {
 
         String urlName = ctx.formParam("url");
         LOGGER.info("urlName is: " + urlName);
+
         String urlAddress;
-
+        URL parcedUrl;
         try {
-            URL rawUrl = new URL(urlName);
-            String protocol = rawUrl.getProtocol();
-            String host = rawUrl.getHost();
-            int port = rawUrl.getPort();
-            String portAsString = port == -1
-                    ? ""
-                    : String.valueOf(port);
-
-            urlAddress = protocol + "://" + host + portAsString;
+            parcedUrl = new URL(urlName);
         } catch (Exception e) {
             ctx.sessionAttribute("flash", "Некорректный URL");
             ctx.sessionAttribute("flash-type", "danger");
@@ -40,6 +35,15 @@ public class URLController {
             LOGGER.debug("An exception has occurred: " + e.getMessage());
             return;
         }
+
+        String protocol = parcedUrl.getProtocol();
+        String host = parcedUrl.getHost();
+        int port = parcedUrl.getPort();
+        String portAsString = port == -1
+                ? ""
+                : String.valueOf(port);
+
+        urlAddress = protocol + "://" + host + portAsString;
 
         Url existingUrl = new QUrl()
                 .name.ieq(urlAddress)
@@ -67,33 +71,37 @@ public class URLController {
     public static Handler showURLs = ctx -> {
         LOGGER.info("Попытка загрузить URLs");
 
-        int normalizedPage;
-        try {
-            String page = ctx.queryParam("page");
-            normalizedPage = Integer.parseInt(page);
-        } catch (IllegalArgumentException e) {
-            normalizedPage = 1;
-        }
-
-        int offset = (normalizedPage - 1) * ROWS_PER_PAGES;
+        int page = ctx.queryParamAsClass("page", Integer.class).getOrDefault(1) - 1;
+        int rowsPerPage = 12;
 
         PagedList<Url> pagedUrls = new QUrl()
-                .setFirstRow(offset)
-                .setMaxRows(ROWS_PER_PAGES)
+                .setFirstRow(page * rowsPerPage)
+                .setMaxRows(rowsPerPage)
                 .orderBy()
                 .id.asc()
                 .findPagedList();
 
-        int pagesCount = pagedUrls.getTotalPageCount();
-
-        int[] pages = IntStream.rangeClosed(1, pagesCount).toArray();
         List<Url> urls = pagedUrls.getList();
 
-        ctx.attribute("urls", urls);
-        ctx.attribute("currentPage", normalizedPage);
-        ctx.attribute("pages", pages);
+        Map<Long, UrlCheck> urlChecks = new QUrlCheck()
+                .url.id.asMapKey()
+                .orderBy()
+                .createdAt.desc()
+                .findMap();
 
-        ctx.render("urls/showURLs");
+        int lastPage = pagedUrls.getTotalPageCount() + 1;
+        int currentPage = pagedUrls.getPageIndex() + 1;
+        List<Integer> pages = IntStream
+                .range(1, lastPage)
+                .boxed()
+                .toList();
+
+        ctx.attribute("urls", urls);
+        ctx.attribute("urlChecks", urlChecks);
+        ctx.attribute("pages", pages);
+        ctx.attribute("currentPage", currentPage);
+        ctx.render("urls/index.html");
+
         LOGGER.info("URLS PAGE IS RENDERED");
     };
 
