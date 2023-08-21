@@ -18,7 +18,7 @@ public final class Url extends Model {
     private String name;
     @WhenCreated
     private Instant createdAt;
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(cascade = CascadeType.ALL)
     private List<UrlCheck> urlChecks;
 
     public Url(String name) {

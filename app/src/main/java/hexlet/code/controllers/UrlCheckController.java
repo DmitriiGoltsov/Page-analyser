@@ -3,8 +3,6 @@ package hexlet.code.controllers;
 import hexlet.code.model.Url;
 import hexlet.code.model.UrlCheck;
 import hexlet.code.model.query.QUrl;
-import io.ebean.DB;
-import io.ebean.Transaction;
 import io.javalin.http.Handler;
 import kong.unirest.HttpResponse;
 import kong.unirest.Unirest;
@@ -44,7 +42,7 @@ public class UrlCheckController {
                     ? ""
                     : descriptionElement.attr("content");
 
-            UrlCheck urlCheckToAdd = new UrlCheck(statusCode, title, h1, description, url);
+            UrlCheck urlCheckToAdd = new UrlCheck(statusCode, title, h1, description);
             url.getUrlChecks().add(urlCheckToAdd);
             url.save();
 
@@ -59,20 +57,4 @@ public class UrlCheckController {
             ctx.sessionAttribute("flash-type", "danger");
         }
     };
-
-    private static String getTagValue (Document document, String tag) {
-        Element element = document.selectFirst(tag);
-
-        return element != null
-                ? element.text()
-                : "";
-    }
-
-    private static String getDescription(Document document) {
-        Element element = document.selectFirst("meta[name=description]");
-
-        return element != null
-                ? element.attr("content")
-                : "";
-    }
 }

@@ -3,6 +3,7 @@ package hexlet.code.model;
 import io.ebean.Model;
 import io.ebean.annotation.ConstraintMode;
 import io.ebean.annotation.DbForeignKey;
+import io.ebean.annotation.NotNull;
 import io.ebean.annotation.WhenCreated;
 
 import javax.persistence.*;
@@ -13,24 +14,29 @@ public final class UrlCheck extends Model {
 
     @Id
     private Long id;
+
     private int statusCode;
+
     private String title;
+
     private String h1;
+
     @Lob
     private String description;
-    @ManyToOne(optional = false)
-    @JoinColumn(name = "url_id", referencedColumnName = "id")
-    @DbForeignKey(onDelete = ConstraintMode.CASCADE)
-    private Url url;
+
     @WhenCreated
     private Instant createdAt;
 
-    public UrlCheck(int statusCode, String title, String h1, String description, Url url) {
+    @ManyToOne(optional = false)
+    @NotNull
+    private Url url;
+
+
+    public UrlCheck(int statusCode, String title, String h1, String description) {
         this.statusCode = statusCode;
         this.title = title;
         this.h1 = h1;
         this.description = description;
-        this.url = url;
     }
 
     public Long getId() {
