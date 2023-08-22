@@ -42,7 +42,7 @@
                 </tr>
                 </thead>
                 <tbody>
-                <tr th:each="urlCheck : ${url.getUrlChecks()}">
+                <tr th:each="urlCheck : ${urlChecks}">
                     <td th:text="${urlCheck.getId()}"></td>
                     <td th:text="${urlCheck.getStatusCode()}"></td>
                     <td th:text="${#strings.abbreviate(urlCheck.getTitle(), 20)}"></td>
@@ -56,12 +56,10 @@
     </section>
 </main>
 
-<footer class="footer border-top py-3 mt-5 bg-light">
-    <div class="container-xl">
-        <div class="text-center">
-            created by
-            <a href="https://ru.hexlet.io" target="_blank">Hexlet</a>
-        </div>
+<<footer class="footer border-top py-3 mt-5 bg-light">
+    <div class="text-center ">
+        2023. Created by <a href="https://github.com/DmitriiGoltsov">Dmitrii Goltsov</a>
+        As a part of <a href="https://ru.hexlet.io/programs/java">Hexlet Java-developer course</a>
     </div>
 </footer>
 </body>

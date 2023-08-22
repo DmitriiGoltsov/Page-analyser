@@ -53,7 +53,7 @@ public class UrlController {
             ctx.sessionAttribute("flash", "Страница уже существует");
             ctx.sessionAttribute("flash-type", "success");
 
-            ctx.redirect("/urls");
+            ctx.redirect("/");
             LOGGER.info("URL already exists!");
             return;
         }
@@ -100,7 +100,7 @@ public class UrlController {
         ctx.attribute("urlChecks", urlChecks);
         ctx.attribute("pages", pages);
         ctx.attribute("currentPage", currentPage);
-        ctx.render("urls/index.html");
+        ctx.render("urls/showURLs.html");
 
         LOGGER.info("URLS PAGE IS RENDERED");
     };
