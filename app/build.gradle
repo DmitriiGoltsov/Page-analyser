@@ -75,6 +75,8 @@ checkstyle {
     toolVersion '10.12.1'
 }
 
+checkstyleMain.exclude '**/build/generated/sources/annotationProcessor/java/main/**'
+
 task generateMigrations(type: JavaExec) {
     classpath = sourceSets.main.runtimeClasspath
     mainClass = 'hexlet.code.MigrationGenerator'
