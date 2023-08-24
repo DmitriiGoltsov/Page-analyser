@@ -50,7 +50,7 @@ public final class AppTest {
     @BeforeEach
     public void beforeEach() {
         database.script().run("/truncate.sql");
-        Url url = new Url(EXPECTED_URL);
+        Url url = new Url(CORRECT_URL);
         url.save();
     }
 
@@ -124,7 +124,21 @@ public final class AppTest {
             assertThat(response.getStatus()).isEqualTo(HttpServletResponse.SC_OK);
             assertThat(body).contains(CORRECT_URL);
 
-            response = Unirest.get(baseUrl + "/urls/2").asString();
+            long wrongId = 1;
+
+            while (true) {
+                Url wrongUrl = new QUrl()
+                        .id.eq(wrongId)
+                        .findOne();
+
+                if (wrongUrl == null) {
+                    break;
+                }
+
+                wrongId++;
+            }
+
+            response = Unirest.get(baseUrl + "/urls/" + wrongId).asString();
             assertThat(response.getStatus()).isEqualTo(HttpServletResponse.SC_NOT_FOUND);
         }
     }
