@@ -44,11 +44,4 @@ public final class Url extends Model {
     public void addUrlCheck(UrlCheck urlCheck) {
         urlChecks.add(urlCheck);
     }
-
-    public UrlCheck getLastCheck() {
-        return urlChecks.stream()
-                .sorted(Comparator.comparing(UrlCheck::getCreatedAt).reversed())
-                .findFirst()
-                .orElse(null);
-    }
 }
