@@ -42,13 +42,13 @@
                 </tr>
                 </thead>
                 <tbody>
-                <tr th:each="urlCheck : ${urlChecks}">
-                    <td th:text="${urlCheck.getId()}"></td>
-                    <td th:text="${urlCheck.getStatusCode()}"></td>
-                    <td th:text="${#strings.abbreviate(urlCheck.getTitle(), 20)}"></td>
-                    <td th:text="${#strings.abbreviate(urlCheck.getH1(), 20)}"></td>
-                    <td th:text="${#strings.abbreviate(urlCheck.getDescription(), 50)}"></td>
-                    <td th:text="${#temporals.format(urlCheck.getCreatedAt(), 'dd/MM/yyyy HH:mm')}"></td>
+                <tr th:each="url : ${urls}" th:object="${url}" th:with="urlCheck=${urlChecks.get(url.getId())}">
+                    <td th:text="*{getId()}"></td>
+                    <td>
+                        <a th:href="@{/urls/{id}(id=*{getId()})}" th:text="*{getName()}"></a>
+                    </td>
+                    <td th:text="${urlCheck ? #temporals.format(urlCheck.getCreatedAt(), 'dd/MM/yyyy HH:mm') : ''}"></td>
+                    <td th:text="${urlCheck ? urlCheck.getStatusCode() : ''}"></td>
                 </tr>
                 </tbody>
             </table>
