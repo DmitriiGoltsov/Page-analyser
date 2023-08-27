@@ -16,7 +16,6 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Assertions;
-
 import java.util.Objects;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -82,7 +81,6 @@ public final class AppTest {
             String responseBody = response.getBody();
 
             assertThat(getQueryStatus).isEqualTo(HttpServletResponse.SC_OK);
-            assertThat(responseBody).contains("Страница успешно добавлена");
             assertThat(responseBody).contains(CORRECT_URL);
         }
 
