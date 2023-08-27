@@ -21,8 +21,6 @@ application {
     mainClass = 'hexlet.code.App'
 }
 
-sourceSets.main.java.srcDirs = ['src/main/java', 'build/generated/sources/annotationProcessor/java/main']
-
 dependencies {
 
     implementation 'io.javalin:javalin:5.6.1'
