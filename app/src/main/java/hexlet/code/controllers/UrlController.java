@@ -16,7 +16,7 @@ import java.util.stream.IntStream;
 
 public class UrlController {
 
-    private static final int ROWS_PER_PAGES = 10;
+    private static final int ROWS_PER_PAGES = 12;
     private static final Logger LOGGER = LoggerFactory.getLogger(UrlController.class.getName());
 
     public static Handler createURL = ctx -> {
@@ -72,11 +72,10 @@ public class UrlController {
         LOGGER.info("Попытка загрузить URLs");
 
         int page = ctx.queryParamAsClass("page", Integer.class).getOrDefault(1) - 1;
-        int rowsPerPage = 12;
 
         PagedList<Url> pagedUrls = new QUrl()
-                .setFirstRow(page * rowsPerPage)
-                .setMaxRows(rowsPerPage)
+                .setFirstRow(page * ROWS_PER_PAGES)
+                .setMaxRows(ROWS_PER_PAGES)
                 .orderBy()
                 .id.asc()
                 .findPagedList();
