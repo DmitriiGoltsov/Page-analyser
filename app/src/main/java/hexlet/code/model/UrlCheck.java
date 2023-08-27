@@ -1,12 +1,12 @@
 package hexlet.code.model;
 
 import io.ebean.Model;
-import io.ebean.annotation.ConstraintMode;
-import io.ebean.annotation.DbForeignKey;
 import io.ebean.annotation.NotNull;
 import io.ebean.annotation.WhenCreated;
-
-import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Lob;
+import javax.persistence.ManyToOne;
 import java.time.Instant;
 
 @Entity
