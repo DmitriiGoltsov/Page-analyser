@@ -17,6 +17,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Assertions;
 
+import java.util.Objects;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 public final class AppTest {
@@ -30,6 +32,7 @@ public final class AppTest {
     private static String baseUrl;
     private static final String EXPECTED_URL = "https://www.example.com";
     private static final String CORRECT_URL = "https://dzen.ru/";
+    private static final String URL_FOR_NON_EXISTING_ENTITY_TEST = "https://google.com";
     private static final String WRONG_URL = "www.ussr.su";
     private static Database database;
 
@@ -124,7 +127,7 @@ public final class AppTest {
             assertThat(response.getStatus()).isEqualTo(HttpServletResponse.SC_OK);
             assertThat(body).contains(CORRECT_URL);
 
-            long wrongId = 1;
+            /*long wrongId = 1;
 
             while (true) {
                 Url wrongUrl = new QUrl()
@@ -136,9 +139,15 @@ public final class AppTest {
                 }
 
                 wrongId++;
-            }
+            }*/
+            Url wrongUrl = new Url(URL_FOR_NON_EXISTING_ENTITY_TEST);
+            wrongUrl.save();
+            long idForDeletion = Objects.requireNonNull(new QUrl()
+                            .name.eq(URL_FOR_NON_EXISTING_ENTITY_TEST)
+                            .findOne()).getId();
 
-            response = Unirest.get(baseUrl + "/urls/" + wrongId).asString();
+            wrongUrl.delete();
+            response = Unirest.get(baseUrl + "/urls/" + idForDeletion).asString();
             assertThat(response.getStatus()).isEqualTo(HttpServletResponse.SC_NOT_FOUND);
         }
     }
