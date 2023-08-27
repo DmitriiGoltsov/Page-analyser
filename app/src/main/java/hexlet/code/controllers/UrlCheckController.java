@@ -46,10 +46,6 @@ public class UrlCheckController {
             url.getUrlChecks().add(urlCheckToAdd);
             url.save();
 
-            ctx.redirect("/urls");
-            ctx.sessionAttribute("flash", "Страница успешно проверена");
-            ctx.sessionAttribute("flash-type", "success");
-
             LOGGER.info("Check is done and added to the DB");
         } catch (UnirestException e) {
             ctx.sessionAttribute("flash", "Некорректный адрес");
@@ -58,5 +54,9 @@ public class UrlCheckController {
             ctx.sessionAttribute("flash", e.getMessage());
             ctx.sessionAttribute("flash-type", "danger");
         }
+
+        ctx.redirect("/urls/" + url.getId());
+        ctx.sessionAttribute("flash", "Страница успешно проверена");
+        ctx.sessionAttribute("flash-type", "success");
     };
 }
