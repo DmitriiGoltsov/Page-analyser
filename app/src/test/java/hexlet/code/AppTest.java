@@ -31,8 +31,8 @@ public final class AppTest {
     private static Javalin app;
     private static String baseUrl;
     private static final String EXPECTED_URL = "https://www.example.com";
-    private static final String CORRECT_URL = "https://dzen.ru/";
-    private static final String URL_FOR_NON_EXISTING_ENTITY_TEST = "https://google.com";
+    private static final String CORRECT_URL = "https://www.google.com";
+    private static final String URL_FOR_NON_EXISTING_ENTITY_TEST = "https://www.dzen.ru";
     private static final String WRONG_URL = "www.ussr.su";
     private static Database database;
 
@@ -103,13 +103,13 @@ public final class AppTest {
         }
 
         @Test
-        public void testShowURLs() {
+        public void testShowUrls() {
             HttpResponse<String> response = Unirest.get(baseUrl + "/urls").asString();
             String body = response.getBody();
             int getQueryStatus = response.getStatus();
 
             assertThat(getQueryStatus).isEqualTo(HttpServletResponse.SC_OK);
-            assertThat(body).contains(EXPECTED_URL);
+            assertThat(body).contains(CORRECT_URL);
         }
 
         @Test
@@ -127,19 +127,6 @@ public final class AppTest {
             assertThat(response.getStatus()).isEqualTo(HttpServletResponse.SC_OK);
             assertThat(body).contains(CORRECT_URL);
 
-            /*long wrongId = 1;
-
-            while (true) {
-                Url wrongUrl = new QUrl()
-                        .id.eq(wrongId)
-                        .findOne();
-
-                if (wrongUrl == null) {
-                    break;
-                }
-
-                wrongId++;
-            }*/
             Url wrongUrl = new Url(URL_FOR_NON_EXISTING_ENTITY_TEST);
             wrongUrl.save();
             long idForDeletion = Objects.requireNonNull(new QUrl()
@@ -156,10 +143,9 @@ public final class AppTest {
     class UrlCheckControllerTest {
 
         @Test
-        public void urlCheckTest() {
+        public void addUrlCheckTest() {
 
-            var response = Unirest
-                    .post(baseUrl + "/urls")
+            Unirest.post(baseUrl + "/urls")
                     .field("url", CORRECT_URL)
                     .asEmpty();
 
@@ -167,20 +153,26 @@ public final class AppTest {
                     .name.equalTo(CORRECT_URL)
                     .findOne();
 
+            long id = actualUrl.getId();
+
             assertThat(actualUrl).isNotNull();
             assertThat(actualUrl.getName()).isEqualTo(CORRECT_URL);
 
+            String urlForPostMethod = baseUrl + "/urls/" + id + "/checks";
+
+            Unirest.post(urlForPostMethod).asEmpty();
+
             UrlCheck actualCheckUrl = new QUrlCheck()
                     .url.equalTo(actualUrl)
-                    .orderBy()
                     .createdAt.desc()
                     .findOne();
 
             assertThat(actualCheckUrl).isNotNull();
             assertThat(actualCheckUrl.getStatusCode()).isEqualTo(200);
-            assertThat(actualCheckUrl.getTitle()).isEqualTo("Test page");
-            assertThat(actualCheckUrl.getH1()).isEqualTo("Do not expect a miracle, miracles yourself!");
-            assertThat(actualCheckUrl.getDescription()).contains("statements of great people");
+            assertThat(actualCheckUrl.getTitle()).isEqualTo("Google");
+            assertThat(actualCheckUrl.getH1())
+                    .isEqualTo("");
+            assertThat(actualCheckUrl.getDescription()).contains("");
         }
 
     }
