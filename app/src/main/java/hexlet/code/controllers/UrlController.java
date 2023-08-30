@@ -31,7 +31,7 @@ public class UrlController {
         } catch (Exception e) {
             ctx.sessionAttribute("flash", "Некорректный URL");
             ctx.sessionAttribute("flash-type", "danger");
-            ctx.redirect("/index.html");
+            ctx.redirect("/");
             LOGGER.debug("An exception has occurred: " + e.getMessage());
             return;
         }
