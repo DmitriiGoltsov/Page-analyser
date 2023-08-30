@@ -66,10 +66,9 @@ public class UrlController {
         Url urlToSave = new Url(urlAddress);
         urlToSave.save();
 
+        ctx.redirect("/urls");
         ctx.sessionAttribute("flash", "Страница успешно добавлена");
         ctx.sessionAttribute("flash-type", "success");
-
-        ctx.redirect("/urls");
         LOGGER.info("URL ADDED SUCCESSFULLY");
     };
 
