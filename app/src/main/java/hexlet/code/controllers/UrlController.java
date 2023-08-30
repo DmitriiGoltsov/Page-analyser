@@ -41,9 +41,14 @@ public class UrlController {
         int port = parcedUrl.getPort();
         String portAsString = port == -1
                 ? ""
-                : String.valueOf(port);
+                : ":" + port;
 
-        urlAddress = protocol + "://" + host + portAsString;
+        urlAddress = String.format(
+                "%s://%s%s",
+                protocol,
+                host,
+                portAsString
+        );
 
         Url existingUrl = new QUrl()
                 .name.ieq(urlAddress)
