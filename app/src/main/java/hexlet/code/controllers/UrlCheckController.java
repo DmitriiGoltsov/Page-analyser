@@ -37,7 +37,7 @@ public class UrlCheckController {
             String h1 = h1Element == null
                     ? ""
                     : h1Element.text();
-            Element descriptionElement = document.selectFirst("description");
+            Element descriptionElement = document.selectFirst("meta[name=description]");
             String description = descriptionElement == null
                     ? ""
                     : descriptionElement.attr("content");
