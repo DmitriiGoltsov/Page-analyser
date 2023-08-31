@@ -71,33 +71,7 @@ public final class UrlCheck extends Model {
         this.id = id;
     }
 
-    public void setStatusCode(int statusCode) {
-        this.statusCode = statusCode;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public void setH1(String h1) {
-        this.h1 = h1;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public void setCreatedAt(Instant createdAt) {
-        this.createdAt = createdAt;
-    }
-
     public void setUrl(Url url) {
         this.url = url;
     }
-
-    public void setUrlId(Long id) {
-        this.url.setId(id);
-    }
-
-
 }

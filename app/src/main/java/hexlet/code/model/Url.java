@@ -43,8 +43,4 @@ public final class Url extends Model {
     public void addUrlCheck(UrlCheck urlCheck) {
         urlChecks.add(urlCheck);
     }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
 }

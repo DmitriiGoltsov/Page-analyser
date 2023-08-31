@@ -29,7 +29,6 @@ public final class AppTest {
 
     private static Javalin app;
     private static String baseUrl;
-    private static final String EXPECTED_URL = "https://www.example.com";
     private static final String CORRECT_URL = "https://www.google.com";
     private static final String URL_FOR_NON_EXISTING_ENTITY_TEST = "https://www.dzen.ru";
     private static final String WRONG_URL = "www.ussr.su";

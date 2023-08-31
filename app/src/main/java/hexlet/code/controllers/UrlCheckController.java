@@ -43,7 +43,7 @@ public class UrlCheckController {
                     : descriptionElement.attr("content");
 
             UrlCheck urlCheckToAdd = new UrlCheck(statusCode, title, h1, description);
-            urlCheckToAdd.setUrlId(id);
+            url.getUrlChecks().add(urlCheckToAdd);
             url.save();
 
             ctx.sessionAttribute("flash", "Страница успешно проверена");
