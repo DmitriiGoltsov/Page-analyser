@@ -24,10 +24,9 @@ public class UrlController {
         String urlName = ctx.formParam("url");
         LOGGER.info("urlName is: " + urlName);
 
-        String urlAddress;
-        URL parcedUrl;
+        URL parsedUrl;
         try {
-            parcedUrl = new URL(urlName);
+            parsedUrl = new URL(urlName);
         } catch (Exception e) {
             ctx.sessionAttribute("flash", "Некорректный URL");
             ctx.sessionAttribute("flash-type", "danger");
@@ -36,14 +35,15 @@ public class UrlController {
             return;
         }
 
-        String protocol = parcedUrl.getProtocol();
-        String host = parcedUrl.getHost();
-        int port = parcedUrl.getPort();
-        String portAsString = port == -1
+        String protocol = parsedUrl.getProtocol();
+        String host = parsedUrl.getHost();
+        int port = parsedUrl.getPort();
+        String portAsString =
+                port == -1
                 ? ""
                 : ":" + port;
 
-        urlAddress = String.format(
+        String urlAddress = String.format(
                 "%s://%s%s",
                 protocol,
                 host,
@@ -66,8 +66,8 @@ public class UrlController {
         Url urlToSave = new Url(urlAddress);
         urlToSave.save();
 
-        ctx.attribute("flash", "Страница успешно добавлена");
-        ctx.attribute("flash-type", "success");
+        ctx.sessionAttribute("flash", "Страница успешно добавлена");
+        ctx.sessionAttribute("flash-type", "success");
 
         ctx.redirect("/urls");
         LOGGER.info("URL ADDED SUCCESSFULLY");
@@ -75,6 +75,10 @@ public class UrlController {
 
     public static Handler showURLs = ctx -> {
         LOGGER.info("Попытка загрузить URLs");
+
+        var flash = ctx.consumeSessionAttribute("flash");
+
+        LOGGER.info("flash is: " + flash.toString());
 
         int page = ctx.queryParamAsClass("page", Integer.class).getOrDefault(1) - 1;
 
@@ -104,6 +108,8 @@ public class UrlController {
         ctx.attribute("urlChecks", urlChecks);
         ctx.attribute("pages", pages);
         ctx.attribute("currentPage", currentPage);
+        ctx.sessionAttribute("flash", flash.toString());
+
         ctx.render("urls/showURLs.html");
 
         LOGGER.info("URLS PAGE IS RENDERED");

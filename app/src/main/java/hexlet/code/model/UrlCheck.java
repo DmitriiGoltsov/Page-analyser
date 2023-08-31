@@ -66,4 +66,33 @@ public final class UrlCheck extends Model {
     public Instant getCreatedAt() {
         return createdAt;
     }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public void setStatusCode(int statusCode) {
+        this.statusCode = statusCode;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public void setH1(String h1) {
+        this.h1 = h1;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public void setCreatedAt(Instant createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public void setUrl(Url url) {
+        this.url = url;
+    }
+
 }

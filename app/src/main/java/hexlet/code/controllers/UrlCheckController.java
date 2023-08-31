@@ -29,21 +29,21 @@ public class UrlCheckController {
             HttpResponse<String> response = Unirest
                     .get(url.getName())
                     .asString();
-            int statusCode = response.getStatus();
-
             Document document = Jsoup.parse(response.getBody());
+
+            int statusCode = response.getStatus();
             String title = document.title();
             Element h1Element = document.selectFirst("h1");
             String h1 = h1Element == null
                     ? ""
                     : h1Element.text();
-            Element descriptionElement = document.selectFirst("description");
+            Element descriptionElement = document.selectFirst("meta[name=description]");
             String description = descriptionElement == null
                     ? ""
                     : descriptionElement.attr("content");
 
             UrlCheck urlCheckToAdd = new UrlCheck(statusCode, title, h1, description);
-            url.getUrlChecks().add(urlCheckToAdd);
+            urlCheckToAdd.setId(id);
             url.save();
 
             ctx.sessionAttribute("flash", "Страница успешно проверена");
