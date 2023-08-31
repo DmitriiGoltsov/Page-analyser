@@ -95,4 +95,9 @@ public final class UrlCheck extends Model {
         this.url = url;
     }
 
+    public void setUrlId(Long id) {
+        this.url.setId(id);
+    }
+
+
 }
