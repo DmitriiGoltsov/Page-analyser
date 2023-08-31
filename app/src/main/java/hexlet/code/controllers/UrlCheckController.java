@@ -29,15 +29,15 @@ public class UrlCheckController {
             HttpResponse<String> response = Unirest
                     .get(url.getName())
                     .asString();
-            Document document = Jsoup.parse(response.getBody());
-
             int statusCode = response.getStatus();
+
+            Document document = Jsoup.parse(response.getBody());
             String title = document.title();
             Element h1Element = document.selectFirst("h1");
             String h1 = h1Element == null
                     ? ""
                     : h1Element.text();
-            Element descriptionElement = document.selectFirst("meta[name=description]");
+            Element descriptionElement = document.selectFirst("description");
             String description = descriptionElement == null
                     ? ""
                     : descriptionElement.attr("content");

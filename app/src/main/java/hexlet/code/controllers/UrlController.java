@@ -78,8 +78,6 @@ public class UrlController {
 
         var flash = ctx.consumeSessionAttribute("flash");
 
-        LOGGER.info("flash is: " + flash.toString());
-
         int page = ctx.queryParamAsClass("page", Integer.class).getOrDefault(1) - 1;
 
         PagedList<Url> pagedUrls = new QUrl()
@@ -108,8 +106,6 @@ public class UrlController {
         ctx.attribute("urlChecks", urlChecks);
         ctx.attribute("pages", pages);
         ctx.attribute("currentPage", currentPage);
-        ctx.sessionAttribute("flash", flash.toString());
-
         ctx.render("urls/showURLs.html");
 
         LOGGER.info("URLS PAGE IS RENDERED");
