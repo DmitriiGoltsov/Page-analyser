@@ -2,7 +2,6 @@ plugins {
     id 'checkstyle'
     id 'jacoco'
     id 'application'
-    id('io.ebean') version '13.18.0'
 }
 
 group = 'hexlet.code'
@@ -36,20 +35,14 @@ dependencies {
     implementation 'com.h2database:h2:2.1.214'
     implementation 'org.postgresql:postgresql:42.5.4'
 
-    implementation 'io.ebean:ebean:13.18.0'
-    implementation 'io.ebean:ebean-ddl-generator:13.20.1'
-    implementation 'io.ebean:ebean-querybean:13.20.1'
-    implementation 'io.ebean:ebean-migration:13.9.0'
-    implementation 'io.ebean:ebean-annotation:8.4'
-    annotationProcessor 'io.ebean:querybean-generator:13.20.1'
     implementation 'org.jsoup:jsoup:1.16.1'
+    implementation 'com.zaxxer:HikariCP:5.0.1'
 
     implementation 'org.glassfish.jaxb:jaxb-runtime:2.3.5'
     implementation 'javax.activation:activation:1.1.1'
 
     testImplementation platform('org.junit:junit-bom:5.9.2')
     testImplementation 'org.junit.jupiter:junit-jupiter:5.9.2'
-    testImplementation 'io.ebean:ebean-test:13.15.0-jakarta'
     testImplementation 'com.konghq:unirest-java:3.14.2'
     testImplementation("com.squareup.okhttp3:mockwebserver:4.11.0")
 }
@@ -58,10 +51,6 @@ test {
     useJUnitPlatform()
     testLogging.showStandardStreams = true
     finalizedBy jacocoTestReport
-}
-
-ebean {
-    debugLevel = 1
 }
 
 jacocoTestReport {
