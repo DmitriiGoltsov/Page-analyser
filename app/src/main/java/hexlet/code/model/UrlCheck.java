@@ -1,18 +1,15 @@
 package hexlet.code.model;
 
-import io.ebean.Model;
-import io.ebean.annotation.NotNull;
-import io.ebean.annotation.WhenCreated;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Lob;
-import javax.persistence.ManyToOne;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 import java.time.Instant;
 
-@Entity
-public final class UrlCheck extends Model {
+@Getter
+@Setter
+@ToString
+public final class UrlCheck {
 
-    @Id
     private Long id;
 
     private int statusCode;
@@ -21,57 +18,18 @@ public final class UrlCheck extends Model {
 
     private String h1;
 
-    @Lob
     private String description;
 
-    @WhenCreated
     private Instant createdAt;
 
-    @ManyToOne(optional = false)
-    @NotNull
-    private Url url;
+    private Long urlId;
 
 
-    public UrlCheck(int statusCode, String title, String h1, String description) {
+    public UrlCheck(int statusCode, String title, String h1, String description, Instant createdAt) {
         this.statusCode = statusCode;
         this.title = title;
         this.h1 = h1;
         this.description = description;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public int getStatusCode() {
-        return statusCode;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public String getH1() {
-        return h1;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public Url getUrl() {
-        return url;
-    }
-
-    public Instant getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public void setUrl(Url url) {
-        this.url = url;
+        this.createdAt = createdAt;
     }
 }
