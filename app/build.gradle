@@ -2,6 +2,7 @@ plugins {
     id 'checkstyle'
     id 'jacoco'
     id 'application'
+    id 'io.freefair.lombok' version '8.2.2'
 }
 
 group = 'hexlet.code'
