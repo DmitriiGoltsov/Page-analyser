@@ -1,14 +1,24 @@
 package hexlet.code;
 
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
 import hexlet.code.controllers.RootController;
 import hexlet.code.controllers.UrlController;
 import hexlet.code.controllers.UrlCheckController;
+import hexlet.code.repository.BaseRepository;
 import io.javalin.Javalin;
 import io.javalin.rendering.template.JavalinThymeleaf;
 import nz.net.ultraq.thymeleaf.layoutdialect.LayoutDialect;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.extras.java8time.dialect.Java8TimeDialect;
 import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.stream.Collectors;
 
 import static io.javalin.apibuilder.ApiBuilder.path;
 import static io.javalin.apibuilder.ApiBuilder.post;
@@ -20,7 +30,7 @@ public class App {
     private static final String DEFAULT_MODE = "production";
     private static final String ADDITIONAL_MODE = "development";
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws SQLException, IOException {
         Javalin app = getApp();
         app.start(getPort());
     }
@@ -29,7 +39,29 @@ public class App {
         return getMode().equals(DEFAULT_MODE);
     }
 
-    public static Javalin getApp() {
+    public static Javalin getApp() throws IOException, SQLException {
+
+        HikariConfig hikariConfig = new HikariConfig();
+        String jdbcUrl = isProduction()
+                ? getDBUrl()
+                : "jdbc:h2:./database";
+
+        hikariConfig.setJdbcUrl(jdbcUrl);
+        hikariConfig.setPassword("sa");
+        hikariConfig.setUsername("sa");
+
+        HikariDataSource hikariDataSource = new HikariDataSource(hikariConfig);
+        var url = App.class.getClassLoader().getResource("schema.sql");
+        var file = new File(url.getFile());
+        String sql = Files.lines(file.toPath())
+                .collect(Collectors.joining("\n"));
+
+        try (Connection connection = hikariDataSource.getConnection();
+             Statement statement = connection.createStatement()) {
+            statement.execute(sql);
+        }
+
+        BaseRepository.dataSource = hikariDataSource;
 
         Javalin app = Javalin.create(config -> {
             if (!isProduction()) {
@@ -69,6 +101,10 @@ public class App {
     private static String getMode() {
         return System.getenv()
                 .getOrDefault("APP_ENV", ADDITIONAL_MODE);
+    }
+
+    private static String getDBUrl() {
+        return System.getenv("JDBC_DATABASE_URL");
     }
 
     private static int getPort() {
