@@ -29,7 +29,6 @@ public final class UrlCheck {
     @Setter
     private String description;
 
-    @Getter
     @Setter
     private Timestamp createdAt;
 
