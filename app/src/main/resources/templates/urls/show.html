@@ -14,7 +14,7 @@
       </tr>
       <tr>
         <td>Дата создания</td>
-        <td th:text="${#temporals.format(url.createdAt, 'dd/MM/yyyy HH:mm')}">20/07/2023 19:06</td>
+        <td th:text="${#temporals.format(urlCreationTime, 'dd/MM/yyyy HH:mm')}">20/07/2023 19:06</td>
       </tr>
     </table>
     <h2 class="mt-5">Проверки</h2>
@@ -31,13 +31,13 @@
       <th class="col-2">Дата проверки</th>
       </thead>
       <tbody>
-      <tr th:each="urlCheck : ${url.getUrlChecks()}">
+      <tr th:each="urlCheck : ${checks}">
         <td th:text="${urlCheck.getId()}"></td>
         <td th:text="${urlCheck.getStatusCode()}"></td>
         <td th:text="${#strings.abbreviate(urlCheck.getTitle(), 20)}"></td>
         <td th:text="${#strings.abbreviate(urlCheck.getH1(), 20)}"></td>
         <td th:text="${#strings.abbreviate(urlCheck.getDescription(), 50)}"></td>
-        <td th:text="${#temporals.format(urlCheck.getCreatedAt(), 'dd/MM/yyyy HH:mm')}"></td>
+        <td th:text="${#temporals.format(creationTimeMap.get(urlCheck), 'dd/MM/yyyy HH:mm')}"></td>
       </tr>
       </tbody>
     </table>
