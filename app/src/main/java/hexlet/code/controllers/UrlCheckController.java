@@ -2,7 +2,8 @@ package hexlet.code.controllers;
 
 import hexlet.code.model.Url;
 import hexlet.code.model.UrlCheck;
-import hexlet.code.model.query.QUrl;
+import hexlet.code.repository.UrlCheckRepository;
+import hexlet.code.repository.UrlRepository;
 import io.javalin.http.Handler;
 import kong.unirest.HttpResponse;
 import kong.unirest.Unirest;
@@ -12,23 +13,28 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import java.sql.Timestamp;
 
 public class UrlCheckController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(UrlController.class.getName());
 
     public static Handler addCheck = ctx -> {
+        LOGGER.info("addCheck Handler: trying to save an UrlCheck entity to DB");
+
         Long id = ctx.pathParamAsClass("id", Long.class).getOrDefault(null);
 
-        Url url = new QUrl()
-                .id.equalTo(id)
-                .forUpdate()
-                .findOne();
+        LOGGER.info("Url's id is " + id);
+
+        Url url = UrlRepository.findById(id).orElse(null);
+
+        LOGGER.info("Url is" + url);
 
         try {
             HttpResponse<String> response = Unirest
                     .get(url.getName())
                     .asString();
+
             int statusCode = response.getStatus();
 
             Document document = Jsoup.parse(response.getBody());
@@ -41,10 +47,16 @@ public class UrlCheckController {
             String description = descriptionElement == null
                     ? ""
                     : descriptionElement.attr("content");
+            Timestamp createdAt = new Timestamp(System.currentTimeMillis());
 
-            UrlCheck urlCheckToAdd = new UrlCheck(statusCode, title, h1, description);
-            url.getUrlChecks().add(urlCheckToAdd);
-            url.save();
+            LOGGER.info("Trying to create a new object of UrlCheck class");
+
+            UrlCheck urlCheckToAdd = new UrlCheck(statusCode, title, h1, description, createdAt, url.getId());
+
+            LOGGER.info("UrlCheckToAdd's fields are these: statusCode " + statusCode + " title " + title + " h1 " + h1
+                    + " description " + description + " createdAt " + createdAt + " urlId " + urlCheckToAdd.getUrlId());
+
+            UrlCheckRepository.save(urlCheckToAdd);
 
             ctx.sessionAttribute("flash", "Страница успешно проверена");
             ctx.sessionAttribute("flash-type", "success");

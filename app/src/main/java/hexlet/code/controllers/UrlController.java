@@ -2,21 +2,23 @@ package hexlet.code.controllers;
 
 import hexlet.code.model.Url;
 import hexlet.code.model.UrlCheck;
-import hexlet.code.model.query.QUrl;
-import hexlet.code.model.query.QUrlCheck;
-import io.ebean.PagedList;
+import hexlet.code.repository.UrlCheckRepository;
+import hexlet.code.repository.UrlRepository;
 import io.javalin.http.Handler;
 import io.javalin.http.NotFoundResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.net.URL;
+import java.sql.Timestamp;
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.IntStream;
 
 public class UrlController {
 
-    private static final int ROWS_PER_PAGES = 12;
     private static final Logger LOGGER = LoggerFactory.getLogger(UrlController.class.getName());
 
     public static Handler createURL = ctx -> {
@@ -50,9 +52,7 @@ public class UrlController {
                 portAsString
         );
 
-        Url existingUrl = new QUrl()
-                .name.ieq(urlAddress)
-                .findOne();
+        Url existingUrl = UrlRepository.findByName(urlAddress).orElse(null);
 
         if (existingUrl != null) {
             ctx.sessionAttribute("flash", "Страница уже существует");
@@ -63,8 +63,8 @@ public class UrlController {
             return;
         }
 
-        Url urlToSave = new Url(urlAddress);
-        urlToSave.save();
+        Url urlToSave = new Url(urlAddress, Timestamp.from(Instant.now()));
+        UrlRepository.save(urlToSave);
 
         ctx.sessionAttribute("flash", "Страница успешно добавлена");
         ctx.sessionAttribute("flash-type", "success");
@@ -76,27 +76,28 @@ public class UrlController {
     public static Handler showURLs = ctx -> {
         LOGGER.info("Попытка загрузить URLs");
 
-        var flash = ctx.consumeSessionAttribute("flash");
-
         int page = ctx.queryParamAsClass("page", Integer.class).getOrDefault(1) - 1;
 
-        PagedList<Url> pagedUrls = new QUrl()
-                .setFirstRow(page * ROWS_PER_PAGES)
-                .setMaxRows(ROWS_PER_PAGES)
-                .orderBy()
-                .id.asc()
-                .findPagedList();
+        List<Url> urls = UrlRepository.getUrls();
 
-        List<Url> urls = pagedUrls.getList();
+        Map<Long, UrlCheck> urlChecks = new HashMap<>();
+        List<UrlCheck> checks = new ArrayList<>();
 
-        Map<Long, UrlCheck> urlChecks = new QUrlCheck()
-                .url.id.asMapKey()
-                .orderBy()
-                .createdAt.desc()
-                .findMap();
+        for (Url url : urls) {
+            urlChecks.put(url.getId(), UrlCheckRepository.findLastCheckByUrlId(url.getId()).orElse(null));
+            UrlCheck lastCheck = UrlCheckRepository.findLastCheckByUrlId(url.getId()).orElse(null);
 
-        int lastPage = pagedUrls.getTotalPageCount() + 1;
-        int currentPage = pagedUrls.getPageIndex() + 1;
+            if (lastCheck != null) {
+                checks.add(lastCheck);
+            }
+        }
+
+        LOGGER.info("urls is: " + urls);
+        LOGGER.info("urlChecks is: " + urlChecks);
+        LOGGER.info("checks is: " + checks);
+
+        int lastPage = urls.size() + 1;
+        int currentPage = page + 1;
         List<Integer> pages = IntStream
                 .range(1, lastPage)
                 .boxed()
@@ -113,21 +114,30 @@ public class UrlController {
 
     public static Handler showURLById = ctx -> {
         LOGGER.info("Trying to find URL by its id");
+
         Long id = ctx.pathParamAsClass("id", Long.class).getOrDefault(null);
 
-        Url url = new QUrl()
-                .id.equalTo(id)
-                .findOne();
+        Url url = UrlRepository.findById(id).orElse(null);
 
         if (url == null) {
             throw new NotFoundResponse("The ulr you are looking for is not found");
         }
 
-        List<UrlCheck> checks = url.getUrlChecks();
+        Instant urlCreationTime = url.getCreatedAt().toInstant();
+
+        List<UrlCheck> checks = UrlCheckRepository.getAllChecks(url.getId());
+
+        Map<UrlCheck, Instant> creationTimeMap = new HashMap<>();
+
+        for (UrlCheck check : checks) {
+            creationTimeMap.put(check, check.getCreatedAt());
+        }
 
         ctx.attribute("url", url);
         ctx.attribute("checks", checks);
+        ctx.attribute("urlCreationTime", urlCreationTime);
+        ctx.attribute("creationTimeMap", creationTimeMap);
         ctx.render("urls/show.html");
-        LOGGER.info("Page of " + url.getName() + "is being rendered");
+        LOGGER.info("Page of " + url.getName() + " is being rendered");
     };
 }
