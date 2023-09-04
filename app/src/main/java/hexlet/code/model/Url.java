@@ -3,8 +3,7 @@ package hexlet.code.model;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
-import java.time.Instant;
-import java.util.List;
+import java.sql.Timestamp;
 
 @Getter
 @Setter
@@ -15,9 +14,9 @@ public final class Url {
 
     @ToString.Include
     private String name;
-    private Instant createdAt;
+    private Timestamp createdAt;
 
-    public Url(String name, Instant createdAt, List<UrlCheck> urlChecks) {
+    public Url(String name, Timestamp createdAt) {
         this.name = name;
         this.createdAt = createdAt;
     }
