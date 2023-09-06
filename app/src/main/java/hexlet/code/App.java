@@ -48,8 +48,8 @@ public class App {
 //        String password;
         if (isProduction()) {
             hikariConfig.setJdbcUrl(System.getenv("DB_EXTERNAL_URL"));
-//            hikariConfig.setPassword(password);
-//            hikariConfig.setUsername(username);
+            hikariConfig.setPassword(System.getenv("DB_PASSWORD"));
+            hikariConfig.setUsername(System.getenv("DB_USER"));
 //            jdbcUrl = System.getenv("DB_EXTERNAL_URL");
 //            username = System.getenv("DB_USER");
 //            password = System.getenv("DB_PASSWORD");
