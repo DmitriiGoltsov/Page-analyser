@@ -46,7 +46,6 @@ public class App {
         String jdbcUrl;
         String username;
         String password;
-        String driverClassName;
         if (isProduction()) {
             jdbcUrl = System.getenv("DB_EXTERNAL_URL");
             username = System.getenv("DB_USER");
