@@ -43,22 +43,28 @@ public class App {
 
         HikariConfig hikariConfig = new HikariConfig();
 
-        String jdbcUrl;
-        String username;
-        String password;
+//        String jdbcUrl;
+//        String username;
+//        String password;
         if (isProduction()) {
-            jdbcUrl = System.getenv("DB_INTERNAL_URL");
-            username = System.getenv("DB_USER");
-            password = System.getenv("DB_PASSWORD");
+            hikariConfig.setJdbcUrl(System.getenv("DB_EXTERNAL_URL"));
+//            hikariConfig.setPassword(password);
+//            hikariConfig.setUsername(username);
+//            jdbcUrl = System.getenv("DB_EXTERNAL_URL");
+//            username = System.getenv("DB_USER");
+//            password = System.getenv("DB_PASSWORD");
         } else {
-            jdbcUrl = "jdbc:h2:./database";
-            username = "sa";
-            password = "sa";
+            hikariConfig.setJdbcUrl("jdbc:h2:./database");
+            hikariConfig.setPassword("sa");
+            hikariConfig.setUsername("sa");
+//            jdbcUrl = "jdbc:h2:./database";
+//            username = "sa";
+//            password = "sa";
         }
 
-        hikariConfig.setJdbcUrl(jdbcUrl);
-        hikariConfig.setPassword(password);
-        hikariConfig.setUsername(username);
+//        hikariConfig.setJdbcUrl(jdbcUrl);
+//        hikariConfig.setPassword(password);
+//        hikariConfig.setUsername(username);
 
         HikariDataSource hikariDataSource = new HikariDataSource(hikariConfig);
         var url = App.class.getClassLoader().getResource("schema.sql");
