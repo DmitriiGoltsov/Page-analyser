@@ -47,7 +47,7 @@ public class App {
         String username;
         String password;
         if (isProduction()) {
-            jdbcUrl = System.getenv("DB_EXTERNAL_URL");
+            jdbcUrl = System.getenv("DB_INTERNAL_URL");
             username = System.getenv("DB_USER");
             password = System.getenv("DB_PASSWORD");
         } else {
