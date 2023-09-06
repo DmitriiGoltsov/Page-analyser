@@ -43,13 +43,13 @@ public class App {
 
         HikariConfig hikariConfig = new HikariConfig();
 
-        String jdbcUrl = "";
-        String username = "";
-        String password = "";
+        String jdbcUrl;
+        String username;
+        String password;
         if (isProduction()) {
-            jdbcUrl = System.getenv("JDBC_DATABASE_URL");
-            username = System.getenv("JDBC_DATABASE_USERNAME");
-            password = System.getenv("JDBC_DATABASE_PASSWORD");
+            jdbcUrl = System.getenv("DB_EXTERNAL_URL");
+            username = System.getenv("DB_USER");
+            password = System.getenv("DB_PASSWORD");
         } else {
             jdbcUrl = "jdbc:h2:./database";
             username = "sa";
