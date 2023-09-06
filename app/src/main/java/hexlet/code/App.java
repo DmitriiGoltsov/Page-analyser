@@ -46,10 +46,13 @@ public class App {
         String jdbcUrl;
         String username;
         String password;
+        String driverClassName;
         if (isProduction()) {
             jdbcUrl = System.getenv("DB_EXTERNAL_URL");
             username = System.getenv("DB_USER");
             password = System.getenv("DB_PASSWORD");
+            driverClassName = "org.postgresql.ds.PGSimpleDataSource";
+            hikariConfig.setDriverClassName(driverClassName);
         } else {
             jdbcUrl = "jdbc:h2:./database";
             username = "sa";
