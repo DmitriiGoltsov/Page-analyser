@@ -56,7 +56,7 @@ public class UrlController {
 
         if (existingUrl != null) {
             ctx.sessionAttribute("flash", "Страница уже существует");
-            ctx.sessionAttribute("flash-type", "success");
+            ctx.sessionAttribute("flash-type", "warning");
 
             LOGGER.info("URL already exists!");
         } else {
@@ -64,7 +64,7 @@ public class UrlController {
             UrlRepository.save(urlToSave);
 
             ctx.sessionAttribute("flash", "Страница успешно добавлена");
-            ctx.sessionAttribute("flash-type", "info");
+            ctx.sessionAttribute("flash-type", "success");
 
             LOGGER.info("URL ADDED SUCCESSFULLY");
         }
