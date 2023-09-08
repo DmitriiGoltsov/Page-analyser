@@ -58,9 +58,7 @@ public class UrlController {
             ctx.sessionAttribute("flash", "Страница уже существует");
             ctx.sessionAttribute("flash-type", "success");
 
-            ctx.redirect("/");
             LOGGER.info("URL already exists!");
-            return;
         }
 
         Url urlToSave = new Url(urlAddress, Timestamp.from(Instant.now()));
