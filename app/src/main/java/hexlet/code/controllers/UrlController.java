@@ -59,16 +59,17 @@ public class UrlController {
             ctx.sessionAttribute("flash-type", "success");
 
             LOGGER.info("URL already exists!");
+        } else {
+            Url urlToSave = new Url(urlAddress, Timestamp.from(Instant.now()));
+            UrlRepository.save(urlToSave);
+
+            ctx.sessionAttribute("flash", "Страница успешно добавлена");
+            ctx.sessionAttribute("flash-type", "info");
+
+            LOGGER.info("URL ADDED SUCCESSFULLY");
         }
 
-        Url urlToSave = new Url(urlAddress, Timestamp.from(Instant.now()));
-        UrlRepository.save(urlToSave);
-
-        ctx.sessionAttribute("flash", "Страница успешно добавлена");
-        ctx.sessionAttribute("flash-type", "success");
-
         ctx.redirect("/urls");
-        LOGGER.info("URL ADDED SUCCESSFULLY");
     };
 
     public static Handler showURLs = ctx -> {
