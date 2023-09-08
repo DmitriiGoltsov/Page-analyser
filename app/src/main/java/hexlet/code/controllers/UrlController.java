@@ -83,11 +83,10 @@ public class UrlController {
         List<UrlCheck> checks = new ArrayList<>();
 
         for (Url url : urls) {
-            urlChecks.put(url.getId(), UrlCheckRepository.findLastCheckByUrlId(url.getId()).orElse(null));
             UrlCheck lastCheck = UrlCheckRepository.findLastCheckByUrlId(url.getId()).orElse(null);
-
             if (lastCheck != null) {
                 checks.add(lastCheck);
+                urlChecks.put(url.getId(), lastCheck);
             }
         }
 
