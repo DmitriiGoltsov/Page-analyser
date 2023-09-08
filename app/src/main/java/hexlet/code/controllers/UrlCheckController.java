@@ -20,7 +20,7 @@ public class UrlCheckController {
     private static final Logger LOGGER = LoggerFactory.getLogger(UrlController.class.getName());
 
     public static Handler addCheck = ctx -> {
-        LOGGER.info("addCheck Handler: trying to save an UrlCheck entity to DB");
+        LOGGER.debug("addCheck Handler: trying to save an UrlCheck entity to DB");
 
         Long id = ctx.pathParamAsClass("id", Long.class).getOrDefault(null);
 

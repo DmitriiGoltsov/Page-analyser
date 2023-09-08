@@ -24,7 +24,7 @@ public class UrlController {
     public static Handler createURL = ctx -> {
 
         String urlName = ctx.formParam("url");
-        LOGGER.info("urlName is: " + urlName);
+        LOGGER.debug("urlName is: " + urlName);
 
         URL parsedUrl;
         try {
@@ -73,7 +73,7 @@ public class UrlController {
     };
 
     public static Handler showURLs = ctx -> {
-        LOGGER.info("Попытка загрузить URLs");
+        LOGGER.debug("Попытка загрузить URLs");
 
         int page = ctx.queryParamAsClass("page", Integer.class).getOrDefault(1) - 1;
 
@@ -137,6 +137,5 @@ public class UrlController {
         ctx.attribute("urlCreationTime", urlCreationTime);
         ctx.attribute("creationTimeMap", creationTimeMap);
         ctx.render("urls/show.html");
-        LOGGER.info("Page of " + url.getName() + " is being rendered");
     };
 }
