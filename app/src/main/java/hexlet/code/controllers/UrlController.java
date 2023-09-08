@@ -90,9 +90,9 @@ public class UrlController {
             }
         }
 
-        LOGGER.info("urls is: " + urls);
-        LOGGER.info("urlChecks is: " + urlChecks);
-        LOGGER.info("checks is: " + checks);
+        LOGGER.debug("urls is: " + urls);
+        LOGGER.debug("urlChecks is: " + urlChecks);
+        LOGGER.debug("checks is: " + checks);
 
         int lastPage = urls.size() + 1;
         int currentPage = page + 1;
