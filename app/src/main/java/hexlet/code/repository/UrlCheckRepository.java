@@ -95,7 +95,10 @@ public class UrlCheckRepository extends BaseRepository {
     }
 
     public static List<UrlCheck> getAllChecks(Long urlId) throws SQLException {
-        String query = "SELECT * FROM url_checks WHERE url_id = ?";
+        String query = """
+                SELECT * FROM url_checks WHERE url_id = ?
+                ORDER BY created_at DESC 
+                """;
 
         try (Connection connection = dataSource.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(query)) {
@@ -106,7 +109,7 @@ public class UrlCheckRepository extends BaseRepository {
             List<UrlCheck> urlChecks = new ArrayList<>();
             while (resultSet.next()) {
                 Long urlCheckId = resultSet.getLong("id");
-                Integer statusCode = resultSet.getInt("status_code");
+                int statusCode = resultSet.getInt("status_code");
                 String title = resultSet.getString("title");
                 String h1 = resultSet.getString("h1");
                 String description = resultSet.getString("description");
@@ -116,11 +119,8 @@ public class UrlCheckRepository extends BaseRepository {
                 urlCheck.setId(urlCheckId);
 
                 urlChecks.add(urlCheck);
-
-                Comparator<UrlCheck> comparator = Comparator.comparing(UrlCheck::getCreatedAt);
-
-                urlChecks.sort(comparator);
             }
+
             return urlChecks;
         } catch (SQLException throwables) {
             throw new SQLException("DB does not find checks of url with id " + urlId);
