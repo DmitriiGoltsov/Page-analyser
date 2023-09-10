@@ -11,7 +11,6 @@ import org.slf4j.LoggerFactory;
 import java.net.URL;
 import java.sql.Timestamp;
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -21,7 +20,7 @@ public class UrlController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(UrlController.class.getName());
 
-    public static Handler createURL = ctx -> {
+    public static Handler createUrl = ctx -> {
 
         String urlName = ctx.formParam("url");
         LOGGER.debug("urlName is: " + urlName);
@@ -72,27 +71,17 @@ public class UrlController {
         ctx.redirect("/urls");
     };
 
-    public static Handler showURLs = ctx -> {
+    public static Handler showUrls = ctx -> {
         LOGGER.debug("Попытка загрузить URLs");
 
         int page = ctx.queryParamAsClass("page", Integer.class).getOrDefault(1) - 1;
 
         List<Url> urls = UrlRepository.getUrls();
 
-        Map<Long, UrlCheck> urlChecks = new HashMap<>();
-        List<UrlCheck> checks = new ArrayList<>();
-
-        for (Url url : urls) {
-            UrlCheck lastCheck = UrlCheckRepository.findLastCheckByUrlId(url.getId()).orElse(null);
-            if (lastCheck != null) {
-                checks.add(lastCheck);
-                urlChecks.put(url.getId(), lastCheck);
-            }
-        }
+        Map<Long, UrlCheck> urlChecks = UrlCheckRepository.findLatestChecks();
 
         LOGGER.debug("urls is: " + urls);
         LOGGER.debug("urlChecks is: " + urlChecks);
-        LOGGER.debug("checks is: " + checks);
 
         int lastPage = urls.size() + 1;
         int currentPage = page + 1;
@@ -110,7 +99,7 @@ public class UrlController {
         LOGGER.info("URLS PAGE IS RENDERED");
     };
 
-    public static Handler showURLById = ctx -> {
+    public static Handler showUrlById = ctx -> {
         LOGGER.info("Trying to find URL by its id");
 
         Long id = ctx.pathParamAsClass("id", Long.class).getOrDefault(null);
