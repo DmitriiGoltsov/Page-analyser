@@ -9,10 +9,7 @@ import java.sql.Statement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
-import java.util.Optional;
-import java.util.List;
-import java.util.ArrayList;
-import java.util.Comparator;
+import java.util.*;
 
 public class UrlCheckRepository extends BaseRepository {
 
@@ -62,6 +59,40 @@ public class UrlCheckRepository extends BaseRepository {
         }
 
         return Optional.ofNullable(urlChecks.get(0));
+    }
+
+    public static Map<Long, UrlCheck> findLatestChecks() throws SQLException {
+        String query = """
+                SELECT DISTINCT ON (url_id) * FROM url_checks
+                ORDER BY url_id DESC, id DESC 
+                """;
+
+        try (Connection connection = dataSource.getConnection();
+             PreparedStatement preparedStatement = connection
+                     .prepareStatement(query)) {
+
+            ResultSet resultSet = preparedStatement.executeQuery();
+            Map<Long, UrlCheck> result = new HashMap<>();
+
+            while (resultSet.next()) {
+                Long id = resultSet.getLong("id");
+                Long urlId = resultSet.getLong("url_id");
+                int statusCode = resultSet.getInt("status_code");
+                String title = resultSet.getString("title");
+                String h1 = resultSet.getString("h1");
+                String description = resultSet.getString("description");
+                Timestamp createdAt = resultSet.getTimestamp("created_at");
+                UrlCheck check = new UrlCheck(statusCode, title, h1, description);
+                check.setId(id);
+                check.setUrlId(urlId);
+                check.setCreatedAt(createdAt);
+                result.put(urlId, check);
+            }
+
+            return result;
+        } catch (SQLException e) {
+            throw new SQLException("Could not find urlChecks!");
+        }
     }
 
     public static List<UrlCheck> getAllChecks(Long urlId) throws SQLException {
