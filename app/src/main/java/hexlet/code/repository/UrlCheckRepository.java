@@ -9,7 +9,11 @@ import java.sql.Statement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
-import java.util.*;
+import java.util.Optional;
+import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
+import java.util.ArrayList;
 
 public class UrlCheckRepository extends BaseRepository {
 
@@ -63,7 +67,7 @@ public class UrlCheckRepository extends BaseRepository {
     public static Map<Long, UrlCheck> findLatestChecks() throws SQLException {
         String query = """
                 SELECT DISTINCT ON (url_id) * FROM url_checks
-                ORDER BY url_id DESC, id DESC 
+                ORDER BY url_id DESC, id DESC
                 """;
 
         try (Connection connection = dataSource.getConnection();
@@ -97,7 +101,7 @@ public class UrlCheckRepository extends BaseRepository {
     public static List<UrlCheck> getAllChecks(Long urlId) throws SQLException {
         String query = """
                 SELECT * FROM url_checks WHERE url_id = ?
-                ORDER BY created_at DESC 
+                ORDER BY created_at DESC
                 """;
 
         try (Connection connection = dataSource.getConnection();
