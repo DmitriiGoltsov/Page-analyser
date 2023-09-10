@@ -97,10 +97,10 @@ public class App {
 
         app.routes(() -> {
             path("/urls", () -> {
-                get(UrlController.showURLs);
-                post(UrlController.createURL);
+                get(UrlController.showUrls);
+                post(UrlController.createUrl);
                 path("/{id}", () -> {
-                    get(UrlController.showURLById);
+                    get(UrlController.showUrlById);
                     path("/checks", () -> {
                         post(UrlCheckController.addCheck);
                     });
