@@ -114,16 +114,16 @@ public class UrlController {
 
         List<UrlCheck> checks = UrlCheckRepository.getAllChecks(url.getId());
 
-        Map<UrlCheck, Instant> creationTimeMap = new HashMap<>();
+        Map<UrlCheck, Instant> urlChekCreationTimeAsInstantMap = new HashMap<>();
 
         for (UrlCheck check : checks) {
-            creationTimeMap.put(check, check.getCreatedAt());
+            urlChekCreationTimeAsInstantMap.put(check, check.getCreatedAt());
         }
 
         ctx.attribute("url", url);
         ctx.attribute("checks", checks);
         ctx.attribute("urlCreationTime", urlCreationTime);
-        ctx.attribute("creationTimeMap", creationTimeMap);
+        ctx.attribute("creationTimeMap", urlChekCreationTimeAsInstantMap);
         ctx.render("urls/show.html");
     };
 }
