@@ -177,4 +177,5 @@ public final class AppTest {
             assertThat(actualCheckUrl.getDescription()).contains("");
         }
     }
+
 }
