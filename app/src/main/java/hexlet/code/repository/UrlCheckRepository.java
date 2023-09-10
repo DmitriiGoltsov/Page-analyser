@@ -15,7 +15,7 @@ public class UrlCheckRepository extends BaseRepository {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(UrlCheckRepository.class.getName());
 
-    public static void save(UrlCheck urlCheck) {
+    public static void save(UrlCheck urlCheck) throws SQLException {
 
         LOGGER.info("UrlCheckRepository's method save() was started!");
 
@@ -45,9 +45,8 @@ public class UrlCheckRepository extends BaseRepository {
                 urlCheck.setId(generatedKeys.getLong("id"));
             }
         } catch (SQLException throwables) {
-            throwables.printStackTrace();
-            System.out.println(throwables.getMessage());
-            throw new RuntimeException("DB has not returned an id after attempt to save the UrlCheck entity!");
+            LOGGER.error(throwables.getMessage(), throwables);
+            throw new SQLException("DB has not returned an id after attempt to save the UrlCheck entity!");
         }
     }
 
