@@ -110,20 +110,10 @@ public class UrlController {
             throw new NotFoundResponse("The ulr you are looking for is not found");
         }
 
-        Instant urlCreationTime = url.getCreatedAt().toInstant();
-
         List<UrlCheck> checks = UrlCheckRepository.getAllChecks(url.getId());
-
-        Map<UrlCheck, Instant> urlChekCreationTimeAsInstantMap = new HashMap<>();
-
-        for (UrlCheck check : checks) {
-            urlChekCreationTimeAsInstantMap.put(check, check.getCreatedAt());
-        }
 
         ctx.attribute("url", url);
         ctx.attribute("checks", checks);
-        ctx.attribute("urlCreationTime", urlCreationTime);
-        ctx.attribute("creationTimeMap", urlChekCreationTimeAsInstantMap);
         ctx.render("urls/show.html");
     };
 }
