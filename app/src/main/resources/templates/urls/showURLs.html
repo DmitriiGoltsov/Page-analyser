@@ -21,7 +21,7 @@
                 <td>
                     <a th:href="@{/urls/{id}(id=*{getId()})}" th:text="*{getName()}"></a>
                 </td>
-                <td th:text="${urlCheck ? #temporals.format(urlCheck.getCreatedAt(), 'dd/MM/yyyy HH:mm') : ''}"></td>
+                <td th:text="${urlCheck ? #temporals.format(urlCheck.getCreatedAtToInstant(), 'dd/MM/yyyy HH:mm') : ''}"></td>
                 <td th:text="${urlCheck ? urlCheck.getStatusCode() : ''}"></td>
             </tr>
             </tbody>
