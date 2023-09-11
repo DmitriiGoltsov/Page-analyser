@@ -95,8 +95,6 @@ public class UrlCheckRepository extends BaseRepository {
             }
 
             return result;
-        } catch (SQLException e) {
-            throw new SQLException("Could not find urlChecks!");
         }
     }
 

@@ -9,6 +9,7 @@ import io.javalin.http.NotFoundResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.net.URL;
+import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.List;
@@ -77,7 +78,12 @@ public class UrlController {
 
         List<Url> urls = UrlRepository.getUrls();
 
-        Map<Long, UrlCheck> urlChecks = UrlCheckRepository.findLatestChecks();
+        Map<Long, UrlCheck> urlChecks = null;
+        try {
+            urlChecks = UrlCheckRepository.findLatestChecks();
+        } catch (SQLException throwables) {
+            LOGGER.error(throwables.getMessage(), throwables);
+        }
 
         LOGGER.debug("urls is: " + urls);
         LOGGER.debug("urlChecks is: " + urlChecks);
