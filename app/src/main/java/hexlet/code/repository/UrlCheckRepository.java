@@ -36,7 +36,7 @@ public class UrlCheckRepository extends BaseRepository {
             preparedStatement.setString(2, urlCheck.getTitle());
             preparedStatement.setString(3, urlCheck.getH1());
             preparedStatement.setString(4, urlCheck.getDescription());
-            preparedStatement.setTimestamp(5, Timestamp.from(urlCheck.getCreatedAt()));
+            preparedStatement.setTimestamp(5, urlCheck.getCreatedAt());
             preparedStatement.setLong(6, urlCheck.getUrlId());
 
             LOGGER.info("preparedStatement is: " + preparedStatement);
