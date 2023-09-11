@@ -21,11 +21,6 @@ public final class Url {
         this.name = name;
     }
 
-    public Url(String name, Timestamp createdAt) {
-        this.name = name;
-        this.createdAt = createdAt;
-    }
-
     public Instant getCreatedAtToInstant() {
         return this.createdAt.toInstant();
     }

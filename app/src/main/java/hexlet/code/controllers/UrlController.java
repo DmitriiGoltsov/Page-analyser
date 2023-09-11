@@ -58,7 +58,7 @@ public class UrlController {
 
             LOGGER.info("URL already exists!");
         } else {
-            Url urlToSave = new Url(urlAddress, Timestamp.from(Instant.now()));
+            Url urlToSave = new Url(urlAddress);
             UrlRepository.save(urlToSave);
 
             ctx.sessionAttribute("flash", "Страница успешно добавлена");

@@ -58,8 +58,9 @@ public class UrlRepository extends BaseRepository {
             if (resultSet.next()) {
                 Long id = resultSet.getLong("id");
                 Timestamp createdAd = resultSet.getTimestamp("created_at");
-                Url url = new Url(name, createdAd);
+                Url url = new Url(name);
                 url.setId(id);
+                url.setCreatedAt(createdAd);
                 return Optional.of(url);
             }
 
@@ -83,7 +84,8 @@ public class UrlRepository extends BaseRepository {
             if (resultSet.next()) {
                 String name = resultSet.getString("name");
                 Timestamp createdAd = resultSet.getTimestamp("created_at");
-                Url url = new Url(name, createdAd);
+                Url url = new Url(name);
+                url.setCreatedAt(createdAd);
                 url.setId(id);
                 return Optional.of(url);
             }
@@ -108,7 +110,8 @@ public class UrlRepository extends BaseRepository {
                 Long id = resultSet.getLong("id");
                 String name = resultSet.getString("name");
                 Timestamp createdAd = resultSet.getTimestamp("created_at");
-                Url url = new Url(name, createdAd);
+                Url url = new Url(name);
+                url.setCreatedAt(createdAd);
                 url.setId(id);
 
                 urls.add(url);

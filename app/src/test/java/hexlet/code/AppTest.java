@@ -58,7 +58,8 @@ public final class AppTest {
         UrlRepository.truncateDB();
         UrlCheckRepository.truncateDB();
 
-        Url firstUrl = new Url(CORRECT_URL, new Timestamp(System.currentTimeMillis()));
+        Url firstUrl = new Url(CORRECT_URL);
+        firstUrl.setCreatedAt(new Timestamp(System.currentTimeMillis()));
         UrlRepository.save(firstUrl);
     }
 
@@ -133,7 +134,8 @@ public final class AppTest {
                             .toLocalDateTime()
                             .format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")));
 
-            Url wrongUrl = new Url(URL_FOR_NON_EXISTING_ENTITY_TEST, new Timestamp(System.currentTimeMillis()));
+            Url wrongUrl = new Url(URL_FOR_NON_EXISTING_ENTITY_TEST);
+            wrongUrl.setCreatedAt(new Timestamp(System.currentTimeMillis()));
             UrlRepository.save(wrongUrl);
             Long idForDeletion = UrlRepository.findByName(URL_FOR_NON_EXISTING_ENTITY_TEST)
                     .orElseThrow(() -> new SQLException("wrongUrl with name " + URL_FOR_NON_EXISTING_ENTITY_TEST
