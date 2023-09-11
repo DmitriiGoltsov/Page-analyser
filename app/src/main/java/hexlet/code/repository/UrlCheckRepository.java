@@ -57,13 +57,38 @@ public class UrlCheckRepository extends BaseRepository {
     }
 
     public static Optional<UrlCheck> findLastCheckByUrlId(Long urlId) throws SQLException {
-        List<UrlCheck> urlChecks = getAllChecks(urlId);
 
-        if (urlChecks.isEmpty()) {
-            return Optional.empty();
+        String query = """
+                SELECT DISTINCT ON (url_id) * FROM url_checks
+                ORDER BY url_id DESC, id DESC
+                LIMIT 1
+                """;
+
+        try (Connection connection = dataSource.getConnection();
+             PreparedStatement preparedStatement = connection
+                     .prepareStatement(query)) {
+
+            ResultSet resultSet = preparedStatement.executeQuery();
+            UrlCheck urlCheck = null;
+
+            while (resultSet.next()) {
+                Long id = resultSet.getLong("id");
+                int statusCode = resultSet.getInt("status_code");
+                String title = resultSet.getString("title");
+                String h1 = resultSet.getString("h1");
+                String description = resultSet.getString("description");
+                Timestamp createdAt = resultSet.getTimestamp("created_at");
+                urlCheck = new UrlCheck(statusCode, title, h1, description, urlId);
+                urlCheck.setId(id);
+                urlCheck.setCreatedAt(createdAt);
+            }
+
+            return Optional.ofNullable(urlCheck);
+
+        } catch (SQLException throwables) {
+            LOGGER.error(throwables.getMessage(), throwables);
+            throw new SQLException("Last urlCheck of url with id " + urlId + " was not found!");
         }
-
-        return Optional.ofNullable(urlChecks.get(0));
     }
 
     public static Map<Long, UrlCheck> findLatestChecks() throws SQLException {
