@@ -1,8 +1,7 @@
 package hexlet.code.repository;
 
 import hexlet.code.model.UrlCheck;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.Statement;
@@ -15,13 +14,12 @@ import java.util.Map;
 import java.util.HashMap;
 import java.util.ArrayList;
 
+@Slf4j
 public class UrlCheckRepository extends BaseRepository {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(UrlCheckRepository.class.getName());
 
     public static void save(UrlCheck urlCheck) throws SQLException {
 
-        LOGGER.info("UrlCheckRepository's method save() was started!");
+        log.info("UrlCheckRepository's method save() was started!");
 
         String query = """
                         INSERT INTO url_checks (status_code, title, h1, description, created_at, url_id)
@@ -41,7 +39,7 @@ public class UrlCheckRepository extends BaseRepository {
             preparedStatement.setTimestamp(5, dayTime);
             preparedStatement.setLong(6, urlCheck.getUrlId());
 
-            LOGGER.info("preparedStatement is: " + preparedStatement);
+            log.info("preparedStatement is: " + preparedStatement);
 
             preparedStatement.executeUpdate();
 
@@ -51,7 +49,7 @@ public class UrlCheckRepository extends BaseRepository {
                 urlCheck.setId(generatedKeys.getLong("id"));
             }
         } catch (SQLException throwables) {
-            LOGGER.error(throwables.getMessage(), throwables);
+            log.error(throwables.getMessage(), throwables);
             throw new SQLException("DB has not returned an id after attempt to save the UrlCheck entity!");
         }
     }
@@ -86,7 +84,7 @@ public class UrlCheckRepository extends BaseRepository {
             return Optional.ofNullable(urlCheck);
 
         } catch (SQLException throwables) {
-            LOGGER.error(throwables.getMessage(), throwables);
+            log.error(throwables.getMessage(), throwables);
             throw new SQLException("Last urlCheck of url with id " + urlId + " was not found!");
         }
     }
@@ -153,6 +151,7 @@ public class UrlCheckRepository extends BaseRepository {
 
             return urlChecks;
         } catch (SQLException throwables) {
+            log.error(throwables.getMessage(), throwables);
             throw new SQLException("DB does not find checks of url with id " + urlId);
         }
     }
@@ -167,7 +166,7 @@ public class UrlCheckRepository extends BaseRepository {
             preparedStatement.executeUpdate();
 
         } catch (SQLException throwables) {
-            throwables.printStackTrace();
+            log.error(throwables.getMessage(), throwables);
             throw new SQLException("Truncate task on table url_checks has failed!");
         }
     }

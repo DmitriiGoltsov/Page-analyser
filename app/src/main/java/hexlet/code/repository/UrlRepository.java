@@ -1,8 +1,7 @@
 package hexlet.code.repository;
 
 import hexlet.code.model.Url;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.Statement;
@@ -13,9 +12,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+@Slf4j
 public class UrlRepository extends BaseRepository {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(UrlRepository.class.getName());
 
     public static void save(Url url) {
         String query = "INSERT INTO urls (name, created_at) VALUES (?, ?)";
@@ -28,7 +26,7 @@ public class UrlRepository extends BaseRepository {
             preparedStatement.setString(1, url.getName());
             preparedStatement.setTimestamp(2, dayTime);
 
-            LOGGER.info("The query is " + preparedStatement);
+            log.info("The query is " + preparedStatement);
 
             preparedStatement.executeUpdate();
 
@@ -38,9 +36,9 @@ public class UrlRepository extends BaseRepository {
                 url.setId(generatedKeys.getLong("id"));
             }
         } catch (SQLException throwables) {
-            LOGGER.debug(String.valueOf(throwables.getErrorCode()));
-            LOGGER.debug(throwables.getSQLState());
-            LOGGER.debug(throwables.getMessage());
+            log.debug(String.valueOf(throwables.getErrorCode()));
+            log.debug(throwables.getSQLState());
+            log.debug(throwables.getMessage());
             throw new RuntimeException("DB has not returned an id after attempt to save the entity!");
         }
     }
@@ -66,7 +64,7 @@ public class UrlRepository extends BaseRepository {
 
             return Optional.empty();
         } catch (SQLException throwables) {
-            LOGGER.error(throwables.getMessage(), throwables);
+            log.error(throwables.getMessage(), throwables);
             throw new SQLException("Url with name " + name + " was now found");
         }
     }
@@ -91,7 +89,7 @@ public class UrlRepository extends BaseRepository {
             }
             return Optional.empty();
         } catch (SQLException throwables) {
-            LOGGER.error(throwables.getMessage(), throwables);
+            log.error(throwables.getMessage(), throwables);
             throw new SQLException("Url with id " + id + " was now found");
         }
     }
@@ -119,7 +117,7 @@ public class UrlRepository extends BaseRepository {
 
             return urls;
         } catch (SQLException throwables) {
-            LOGGER.error(throwables.getMessage(), throwables);
+            log.error(throwables.getMessage(), throwables);
             throw new SQLException("The entities were not found in DB!");
         }
     }
@@ -134,7 +132,7 @@ public class UrlRepository extends BaseRepository {
             preparedStatement.executeUpdate();
 
         } catch (SQLException throwables) {
-            LOGGER.error(throwables.getMessage(), throwables);
+            log.error(throwables.getMessage(), throwables);
             throw new SQLException("Truncate task on table url has failed!");
         }
     }
@@ -150,7 +148,7 @@ public class UrlRepository extends BaseRepository {
             return preparedStatement.executeUpdate() > 0;
 
         } catch (SQLException throwables) {
-            LOGGER.error(throwables.getMessage(), throwables);
+            log.error(throwables.getMessage(), throwables);
             throw new SQLException("The url entity with id " + id + "was not deleted");
         }
     }

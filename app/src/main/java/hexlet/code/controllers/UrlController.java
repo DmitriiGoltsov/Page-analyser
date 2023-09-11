@@ -6,6 +6,7 @@ import hexlet.code.repository.UrlCheckRepository;
 import hexlet.code.repository.UrlRepository;
 import io.javalin.http.Handler;
 import io.javalin.http.NotFoundResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.net.URL;
@@ -16,14 +17,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.IntStream;
 
+@Slf4j
 public class UrlController {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(UrlController.class.getName());
 
     public static Handler createUrl = ctx -> {
 
         String urlName = ctx.formParam("url");
-        LOGGER.debug("urlName is: " + urlName);
+        log.debug("urlName is: " + urlName);
 
         URL parsedUrl;
         try {
@@ -32,7 +32,7 @@ public class UrlController {
             ctx.sessionAttribute("flash", "Некорректный URL");
             ctx.sessionAttribute("flash-type", "danger");
             ctx.redirect("/");
-            LOGGER.debug("An exception has occurred: " + e.getMessage());
+            log.debug("An exception has occurred: " + e.getMessage());
             return;
         }
 
@@ -57,7 +57,7 @@ public class UrlController {
             ctx.sessionAttribute("flash", "Страница уже существует");
             ctx.sessionAttribute("flash-type", "warning");
 
-            LOGGER.info("URL already exists!");
+            log.info("URL already exists!");
         } else {
             Url urlToSave = new Url(urlAddress);
             UrlRepository.save(urlToSave);
@@ -65,14 +65,14 @@ public class UrlController {
             ctx.sessionAttribute("flash", "Страница успешно добавлена");
             ctx.sessionAttribute("flash-type", "success");
 
-            LOGGER.info("URL ADDED SUCCESSFULLY");
+            log.info("URL ADDED SUCCESSFULLY");
         }
 
         ctx.redirect("/urls");
     };
 
     public static Handler showUrls = ctx -> {
-        LOGGER.debug("Попытка загрузить URLs");
+        log.debug("Попытка загрузить URLs");
 
         int page = ctx.queryParamAsClass("page", Integer.class).getOrDefault(1) - 1;
 
@@ -82,11 +82,11 @@ public class UrlController {
         try {
             urlChecks = UrlCheckRepository.findLatestChecks();
         } catch (SQLException throwables) {
-            LOGGER.error(throwables.getMessage(), throwables);
+            log.error(throwables.getMessage(), throwables);
         }
 
-        LOGGER.debug("urls is: " + urls);
-        LOGGER.debug("urlChecks is: " + urlChecks);
+        log.debug("urls is: " + urls);
+        log.debug("urlChecks is: " + urlChecks);
 
         int lastPage = urls.size() + 1;
         int currentPage = page + 1;
@@ -101,11 +101,11 @@ public class UrlController {
         ctx.attribute("currentPage", currentPage);
         ctx.render("urls/showURLs.html");
 
-        LOGGER.info("URLS PAGE IS RENDERED");
+        log.info("URLS PAGE IS RENDERED");
     };
 
     public static Handler showUrlById = ctx -> {
-        LOGGER.info("Trying to find URL by its id");
+        log.info("Trying to find URL by its id");
 
         Long id = ctx.pathParamAsClass("id", Long.class).getOrDefault(null);
 
