@@ -1,16 +1,18 @@
 package hexlet.code;
 
 import hexlet.code.model.Url;
-import hexlet.code.model.UrlCheck;
 import hexlet.code.repository.UrlCheckRepository;
 import hexlet.code.repository.UrlRepository;
 
 import io.javalin.Javalin;
+import io.javalin.testtools.JavalinTest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import kong.unirest.HttpResponse;
 import kong.unirest.Unirest;
-import org.h2.engine.Database;
+
+import okhttp3.mockwebserver.MockResponse;
+import okhttp3.mockwebserver.MockWebServer;
 
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -20,6 +22,10 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Assertions;
 
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.format.DateTimeFormatter;
@@ -33,12 +39,26 @@ public final class AppTest {
         assertThat(true).isEqualTo(true);
     }
 
+    private static MockWebServer mockServer;
     private static Javalin app;
     private static String baseUrl;
     private static final String CORRECT_URL = "https://www.google.com";
     private static final String URL_FOR_NON_EXISTING_ENTITY_TEST = "https://www.dzen.ru";
     private static final String WRONG_URL = "www.ussr.su";
-    private static Database database;
+
+    private static Path getFixturePath(String fileName) {
+        return Paths.get("src", "test", "resources", "fixtures", fileName)
+                .toAbsolutePath().normalize();
+    }
+
+    private static String readFixture(String fileName) throws IOException {
+        Path filePath = getFixturePath(fileName);
+        return Files.readString(filePath).trim();
+    }
+
+    private static String getDatabaseUrl() {
+        return System.getenv().getOrDefault("JDBC_DATABASE_URL", "jdbc:h2:mem:project");
+    }
 
     @BeforeAll
     public static void beforeAll() throws SQLException, IOException {
@@ -46,11 +66,18 @@ public final class AppTest {
         app.start(0);
         int port = app.port();
         baseUrl = "http://localhost:" + port;
+
+        mockServer = new MockWebServer();
+        MockResponse mockedResponse = new MockResponse()
+                .setBody(readFixture("index.html"));
+        mockServer.enqueue(mockedResponse);
+        mockServer.start();
     }
 
     @AfterAll
-    public static void afterAll() {
+    public static void afterAll() throws IOException {
         app.stop();
+        mockServer.shutdown();
     }
 
     @BeforeEach
@@ -139,7 +166,7 @@ public final class AppTest {
             UrlRepository.save(wrongUrl);
             Long idForDeletion = UrlRepository.findByName(URL_FOR_NON_EXISTING_ENTITY_TEST)
                     .orElseThrow(() -> new SQLException("wrongUrl with name " + URL_FOR_NON_EXISTING_ENTITY_TEST
-                                    + " was not found in DB!"))
+                            + " was not found in DB!"))
                     .getId();
 
             UrlRepository.delete(idForDeletion);
@@ -152,32 +179,36 @@ public final class AppTest {
     class UrlCheckControllerTest {
 
         @Test
-        public void addUrlCheckTest() throws SQLException {
+        public void addUrlCheckTest() throws SQLException, IOException {
 
-            Unirest.post(baseUrl + "/urls")
-                    .field("url", CORRECT_URL)
-                    .asEmpty();
+            Javalin additionalApp = App.getApp();
 
-            Url actualUrl = UrlRepository.findByName(CORRECT_URL)
-                    .orElseThrow(() -> new SQLException("Url with name " + CORRECT_URL + " was not found"));
+            String url = mockServer.url("/").toString().replaceAll("/$", "");
 
-            Long id = actualUrl.getId();
+            JavalinTest.test(additionalApp, (server, client) -> {
+                String requestBody = "url=" + url;
+                assertThat(client.post("/urls", requestBody).code()).isEqualTo(HttpServletResponse.SC_OK);
 
-            assertThat(actualUrl.getName()).isEqualTo(CORRECT_URL);
+                Url actualUrl = UrlRepository.findByName(url).orElse(null);
+                assertThat(actualUrl).isNotNull();
+                System.out.println("\n!!!!!");
+                System.out.println(actualUrl);
 
-            String urlForPostMethod = baseUrl + "/urls/" + id + "/checks";
+                System.out.println("\n");
+                assertThat(actualUrl.getName()).isEqualTo(url);
 
-            Unirest.post(urlForPostMethod).asEmpty();
+                client.post("/urls/" + actualUrl.getId() + "/checks");
 
-            UrlCheck actualCheckUrl = UrlCheckRepository.findLastCheckByUrlId(id)
-                    .orElseThrow(() -> new SQLException("The last check for url with id " + id + " was not found"));
+                assertThat(client.get("/urls/" + actualUrl.getId()).code())
+                        .isEqualTo(HttpServletResponse.SC_OK);
 
-            assertThat(actualCheckUrl.getStatusCode()).isEqualTo(200);
-            assertThat(actualCheckUrl.getTitle()).isEqualTo("Google");
-            assertThat(actualCheckUrl.getH1())
-                    .isEqualTo("");
-            assertThat(actualCheckUrl.getDescription()).contains("");
+                var actualCheck = UrlCheckRepository.findLastCheckByUrlId(actualUrl.getId())
+                        .orElse(null);
+                assertThat(actualCheck).isNotNull();
+                assertThat(actualCheck.getTitle()).isEqualTo("Test page");
+                assertThat(actualCheck.getH1()).isEqualTo("Do not expect a miracle, miracles yourself!");
+                assertThat(actualCheck.getDescription()).isEqualTo("statements of great people");
+            });
         }
     }
-
 }
