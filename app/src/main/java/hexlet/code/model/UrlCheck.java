@@ -29,6 +29,7 @@ public final class UrlCheck {
     @Setter
     private String description;
 
+    @Getter
     @Setter
     private Timestamp createdAt;
 
@@ -52,7 +53,7 @@ public final class UrlCheck {
         this.description = description;
     }
 
-    public Instant getCreatedAt() {
+    public Instant getCreatedAtToInstant() {
         return createdAt.toInstant();
     }
 }
