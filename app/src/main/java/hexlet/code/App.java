@@ -42,24 +42,7 @@ public class App {
     public static Javalin getApp() throws IOException, SQLException {
 
         HikariConfig hikariConfig = new HikariConfig();
-
-        String jdbcUrl;
-        String username;
-        String password;
-
-        if (isProduction()) {
-            jdbcUrl = System.getenv("DB_EXTERNAL_URL");
-            username = System.getenv("DB_USER");
-            password = System.getenv("DB_PASSWORD");
-        } else {
-            jdbcUrl = "jdbc:h2:./database";
-            username = "sa";
-            password = "sa";
-        }
-
-        hikariConfig.setJdbcUrl(jdbcUrl);
-        hikariConfig.setPassword(password);
-        hikariConfig.setUsername(username);
+        hikariConfig.setJdbcUrl(getDatabaseUrl());
 
         HikariDataSource hikariDataSource = new HikariDataSource(hikariConfig);
         var url = App.class.getClassLoader().getResource("schema.sql");
@@ -117,6 +100,10 @@ public class App {
     private static int getPort() {
         String port = System.getenv().getOrDefault("PORT", DEFAULT_PORT);
         return Integer.valueOf(port);
+    }
+    private static String getDatabaseUrl() {
+        return System.getenv()
+                .getOrDefault("JDBC_DATABASE_URL", "jdbc:h2:mem:project");
     }
 
     private static TemplateEngine getTemplateEngine() {
