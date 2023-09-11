@@ -51,7 +51,7 @@ public class UrlCheckController {
 
             LOGGER.info("Trying to create a new object of UrlCheck class");
 
-            UrlCheck urlCheckToAdd = new UrlCheck(statusCode, title, h1, description, createdAt, url.getId());
+            UrlCheck urlCheckToAdd = new UrlCheck(statusCode, title, h1, description, url.getId());
 
             LOGGER.info("UrlCheckToAdd's fields are these: statusCode " + statusCode + " title " + title + " h1 " + h1
                     + " description " + description + " createdAt " + createdAt + " urlId " + urlCheckToAdd.getUrlId());

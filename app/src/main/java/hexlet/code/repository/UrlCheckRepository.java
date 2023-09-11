@@ -28,6 +28,8 @@ public class UrlCheckRepository extends BaseRepository {
                         VALUES (?, ?, ?, ?, ?, ?)
                         """;
 
+        Timestamp dayTime = new Timestamp(System.currentTimeMillis());
+
         try (Connection connection = dataSource.getConnection();
              PreparedStatement preparedStatement = connection
                      .prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
@@ -36,7 +38,7 @@ public class UrlCheckRepository extends BaseRepository {
             preparedStatement.setString(2, urlCheck.getTitle());
             preparedStatement.setString(3, urlCheck.getH1());
             preparedStatement.setString(4, urlCheck.getDescription());
-            preparedStatement.setTimestamp(5, urlCheck.getCreatedAt());
+            preparedStatement.setTimestamp(5, dayTime);
             preparedStatement.setLong(6, urlCheck.getUrlId());
 
             LOGGER.info("preparedStatement is: " + preparedStatement);
@@ -119,7 +121,8 @@ public class UrlCheckRepository extends BaseRepository {
                 String description = resultSet.getString("description");
                 Timestamp createdAt = resultSet.getTimestamp("created_at");
 
-                UrlCheck urlCheck = new UrlCheck(statusCode, title, h1, description, createdAt, urlId);
+                UrlCheck urlCheck = new UrlCheck(statusCode, title, h1, description, urlId);
+                urlCheck.setCreatedAt(createdAt);
                 urlCheck.setId(urlCheckId);
 
                 urlChecks.add(urlCheck);
