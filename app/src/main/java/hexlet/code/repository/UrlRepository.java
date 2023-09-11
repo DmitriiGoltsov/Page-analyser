@@ -65,6 +65,7 @@ public class UrlRepository extends BaseRepository {
 
             return Optional.empty();
         } catch (SQLException throwables) {
+            LOGGER.error(throwables.getMessage(), throwables);
             throw new SQLException("Url with name " + name + " was now found");
         }
     }
@@ -88,6 +89,7 @@ public class UrlRepository extends BaseRepository {
             }
             return Optional.empty();
         } catch (SQLException throwables) {
+            LOGGER.error(throwables.getMessage(), throwables);
             throw new SQLException("Url with id " + id + " was now found");
         }
     }
@@ -114,6 +116,7 @@ public class UrlRepository extends BaseRepository {
 
             return urls;
         } catch (SQLException throwables) {
+            LOGGER.error(throwables.getMessage(), throwables);
             throw new SQLException("The entities were not found in DB!");
         }
     }
@@ -128,7 +131,7 @@ public class UrlRepository extends BaseRepository {
             preparedStatement.executeUpdate();
 
         } catch (SQLException throwables) {
-            throwables.printStackTrace();
+            LOGGER.error(throwables.getMessage(), throwables);
             throw new SQLException("Truncate task on table url has failed!");
         }
     }
@@ -144,7 +147,7 @@ public class UrlRepository extends BaseRepository {
             return preparedStatement.executeUpdate() > 0;
 
         } catch (SQLException throwables) {
-            throwables.printStackTrace();
+            LOGGER.error(throwables.getMessage(), throwables);
             throw new SQLException("The url entity with id " + id + "was not deleted");
         }
     }
