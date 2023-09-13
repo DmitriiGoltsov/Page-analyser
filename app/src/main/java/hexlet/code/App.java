@@ -16,6 +16,7 @@ import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -48,9 +49,19 @@ public class App {
 
         HikariDataSource hikariDataSource = new HikariDataSource(hikariConfig);
         var url = App.class.getClassLoader().getResource("schema.sql");
-        var file = new File(url.getFile());
-        String sql = Files.lines(file.toPath())
-                .collect(Collectors.joining("\n"));
+
+        File file;
+        String sql;
+
+        try {
+            file = new File(url.getFile());
+            sql = Files.lines(file.toPath())
+                    .collect(Collectors.joining("\n"));
+        } catch (NoSuchFileException e) {
+            file = new File("app/build/resources/main/schema.sql");
+            sql = Files.lines(file.toPath())
+                    .collect(Collectors.joining("\n"));
+        }
 
         log.info("db url " + url);
         log.info("sql is " + sql);
