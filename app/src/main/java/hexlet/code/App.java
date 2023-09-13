@@ -78,7 +78,7 @@ public class App {
                         url_id      bigint                                  not null
                     );
                     """;
-    }
+        }
 
 
         try (Connection connection = hikariDataSource.getConnection();
