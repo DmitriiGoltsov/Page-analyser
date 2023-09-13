@@ -13,7 +13,7 @@
 ## Description
 The study project for learning how to create a java MVC application and how to use Javalin framework, Thymeleaf and other technologies for that purpose.
 
-The application provides a service that is able to collect, analyse url-s for their SEO and store results of this analyze using postgreSQL database. 
+The application provides a service that is able to collect and analyse url-s for their SEO and also store results of this analyse, using postgreSQL database. 
 
 Particularly it provides simple validation for input url-s, assigns them unique ids and also collect and store basic data about them:
 
