@@ -8,6 +8,7 @@ import hexlet.code.controllers.UrlCheckController;
 import hexlet.code.repository.BaseRepository;
 import io.javalin.Javalin;
 import io.javalin.rendering.template.JavalinThymeleaf;
+import lombok.extern.slf4j.Slf4j;
 import nz.net.ultraq.thymeleaf.layoutdialect.LayoutDialect;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.extras.java8time.dialect.Java8TimeDialect;
@@ -24,6 +25,7 @@ import static io.javalin.apibuilder.ApiBuilder.path;
 import static io.javalin.apibuilder.ApiBuilder.post;
 import static io.javalin.apibuilder.ApiBuilder.get;
 
+@Slf4j
 public class App {
 
     private static final String DEFAULT_PORT = "8085";
@@ -49,6 +51,9 @@ public class App {
         var file = new File(url.getFile());
         String sql = Files.lines(file.toPath())
                 .collect(Collectors.joining("\n"));
+
+        log.info("db url " + url);
+        log.info("sql is " + sql);
 
         try (Connection connection = hikariDataSource.getConnection();
              Statement statement = connection.createStatement()) {
